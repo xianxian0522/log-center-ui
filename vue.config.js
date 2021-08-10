@@ -11,7 +11,11 @@ const vueConfig = {
       '/api/my/': {
         target: 'http://172.16.97.194:3000',
         changeOrigin: true,
-      }
+      },
+      '/api/': {
+        target: 'http://172.16.97.194:7008',
+        changeOrigin: true,
+      },
     },
     watchOptions: {
       ignored: ['**/node_modules', '**/.#*']
