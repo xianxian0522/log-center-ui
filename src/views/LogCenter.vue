@@ -4,3 +4,13 @@
     <a-button>banbe</a-button>
   </div>
 </template>
+
+<script lang="ts">
+export default {
+  name: "LogCenter",
+};
+</script>
+
+<style scoped lang="less">
+
+</style>
