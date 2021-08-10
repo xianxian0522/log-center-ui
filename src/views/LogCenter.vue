@@ -15,7 +15,8 @@ export default {
     const querySearchLog = async () => {
       try {
         const value = {}
-        await logCenterRepository.queryLog(value)
+        const query = {limit: 100, searchContent: 'xxx'}
+        await logCenterRepository.queryLog(value, query)
       } catch (e) {
         console.error(e)
       }

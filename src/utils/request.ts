@@ -40,9 +40,9 @@ export default {
         .catch(err => reject(err))
     })
   },
-  post<T>(url: string, params = {}) {
+  post<T>(url: string, params = {}, query = {}) {
     return new Promise<T>((resolve, reject) => {
-      service.post(url, params)
+      service.post(url, params, {params: query})
         .then(res => resolve(res.data))
         .catch(err => reject(err))
     })

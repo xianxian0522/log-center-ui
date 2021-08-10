@@ -8,5 +8,5 @@ const ApiLog = `${API}/log`
 export default {
   login: () => request.get<LoginResponse>(ApiLogin),
 
-  queryLog: (params: any) => request.post(`${ApiLog}/search`, params),
+  queryLog: (params: any, query?: any) => request.post(`${ApiLog}/search`, params, query),
 }
