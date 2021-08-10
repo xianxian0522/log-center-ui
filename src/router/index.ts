@@ -28,6 +28,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../views/LogCenter.vue'),
       }
     ]
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    component: () => import('../views/NotFound.vue'),
   }
 ];
 

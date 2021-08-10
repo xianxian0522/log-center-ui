@@ -27,7 +27,8 @@ service.interceptors.response.use(response => {
     localStorage.removeItem('token')
     router.push('/login').then()
   }
-  message.error(error.response?.data)
+  const err = error.response?.data?.error || error.response?.data
+  message.error(err)
   return Promise.reject(error)
 })
 

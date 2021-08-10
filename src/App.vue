@@ -34,5 +34,6 @@ export default defineComponent({
   -moz-osx-font-smoothing: grayscale;
   /*text-align: center;*/
   color: #2c3e50;
+  height: inherit;
 }
 </style>

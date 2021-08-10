@@ -6,8 +6,29 @@
 </template>
 
 <script lang="ts">
+import logCenterRepository from "@/api/logCenterRepository";
+import { onMounted } from "vue";
+
 export default {
   name: "LogCenter",
+  setup() {
+    const querySearchLog = async () => {
+      try {
+        const value = {}
+        await logCenterRepository.queryLog(value)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    onMounted(() => {
+      querySearchLog()
+    })
+
+    return {
+
+    }
+  }
 };
 </script>
 
