@@ -1,6 +1,7 @@
 <template>
   <div>
     <HeaderComponent :logoTitle="'LOG-CENTER'" :menuSelect="'/log'" />
+    <router-view></router-view>
   </div>
 </template>
 

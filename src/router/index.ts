@@ -24,6 +24,7 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: '',
+        name: 'log',
         component: () => import('../views/LogCenter.vue'),
       }
     ]
