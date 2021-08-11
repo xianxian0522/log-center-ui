@@ -23,7 +23,7 @@ export default {
     }
 
     onMounted(() => {
-      querySearchLog()
+      // querySearchLog()
     })
 
     return {
