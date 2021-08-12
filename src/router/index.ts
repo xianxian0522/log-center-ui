@@ -24,9 +24,23 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: '',
+        redirect: '/log/list',
+      },
+      {
+        path: 'list',
         name: 'log',
         component: () => import('../views/LogCenter.vue'),
-      }
+      },
+      {
+        path: 'configure',
+        name: 'configure',
+        component: () => import('../views/LogConfiguration.vue')
+      },
+      {
+        path: 'search',
+        name: 'search',
+        component: () => import('../views/LogSearch.vue')
+      },
     ]
   },
   {

@@ -8,9 +8,12 @@
           v-model:selectedKeys="selectedKeysMenu"
           :style="{ height: '100%', borderRight: 0 }"
         >
-          <a-menu-item key="9">option9</a-menu-item>
-          <a-menu-item key="10">option10</a-menu-item>
-          <a-menu-item key="11">option11</a-menu-item>
+          <a-menu-item v-for="item in bar" :key="item.path">
+            <span>
+              <icon-font :type="item.icon" style="margin-right: 10px" />
+              <router-link :to="{name: item.route}">{{ item.name }}</router-link>
+            </span>
+          </a-menu-item>
         </a-menu>
       </a-layout-sider>
       <a-layout-content class="log-layout-content">
@@ -23,15 +26,25 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { BarItem } from "@/utils/response";
+import { createFromIconfontCN } from "@ant-design/icons-vue";
+import { useRoute } from "vue-router";
+
+const IconFont = createFromIconfontCN({
+  scriptUrl: '//at.alicdn.com/t/font_2739460_lsxhejxhdz.js'
+})
 
 export default defineComponent({
   name: "Layout",
+  components: { IconFont },
   setup() {
-    const selectedKeysMenu = ref(['9'])
+    const route = useRoute()
+    const url = route.path.split('/')
+
+    const selectedKeysMenu = ref([url[2]])
     const bar = ref<BarItem[]>([
-      {id: 1, icon: '', path: '', name: '日志查看', route: ''},
-      {id: 2, icon: '', path: '', name: '', route: ''},
-      {id: 2, icon: '', path: '', name: '', route: ''},
+      {id: 1, icon: 'icon-log', path: 'list', name: '日志查看', route: 'log'},
+      {id: 2, icon: 'icon-configure', path: 'configure', name: '设置', route: 'configure'},
+      {id: 3, icon: 'icon-search', path: 'search', name: '高级搜索', route: 'search'},
     ])
 
     return {
