@@ -1,7 +1,18 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-import { Avatar, Button, ConfigProvider, Dropdown, Form, Input, Layout, Menu, Select } from "ant-design-vue";
+import {
+  Avatar,
+  Button,
+  ConfigProvider,
+  DatePicker,
+  Dropdown,
+  Form,
+  Input,
+  Layout,
+  Menu,
+  Select, Table
+} from "ant-design-vue";
 import HeaderComponent from 'menu-header-component/dist/menu-header-component.umd.js'
 import 'menu-header-component/dist/menu-header-component.css'
 
@@ -18,6 +29,8 @@ app.use(Layout)
 app.use(Form)
 app.use(Input)
 app.use(Select)
+app.use(DatePicker)
+app.use(Table)
 
 app.use(HeaderComponent)
 

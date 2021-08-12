@@ -1,0 +1,72 @@
+<template>
+  <div>
+    <a-table class="common-table" :columns="columns" :data-source="dataSource" :rowKey="record => record.id"
+             @change="paginationChange"
+             :scroll="{x: scrollX}"
+             :pagination="isPage ? isPagination : pagination">
+      <template #name="{ text }">
+        <a>{{ text }}</a>
+      </template>
+      <template #time="{ text }">
+        <span>{{ timeFormat(text) }}</span>
+      </template>
+      <template #action="{ record }" >
+        <div >
+          <slot :action="record"></slot>
+        </div>
+      </template>
+    </a-table>
+  </div>
+</template>
+
+<script lang="ts">
+import moment from "moment";
+import { TableState } from "ant-design-vue/es/table/interface";
+import { reactive } from "vue";
+
+export default {
+  name: "CommonTable",
+  props: {
+    columns: Array,
+    dataSource: Array,
+    scrollX: {
+      type: String,
+      default: '1100px'
+    },
+    isPage: Boolean,
+    isPagination: Object,
+  },
+  emits: ['paginationChange'],
+  setup(props: any, {emit}: any) {
+    const pagination = reactive({
+      showSizeChanger: true,
+      current: 1,
+      pageSize: 10,
+    })
+    const paginationChange = (page: TableState['pagination']) => {
+      const pageNumber = page?.current as number
+      const pageSize = page?.pageSize as number
+      if (props.isPage) {
+        console.log(pageNumber, pageSize)
+        emit('paginationChange', {pageNumber, pageSize})
+      } else {
+        pagination.current = pageNumber
+        pagination.pageSize = pageSize
+      }
+    }
+    const timeFormat = (value: string) => {
+      return moment(value).format('YYYY-MM-DD HH:mm:ss')
+    }
+
+    return {
+      pagination,
+      paginationChange,
+      timeFormat,
+    }
+  }
+};
+</script>
+
+<style scoped lang="less">
+
+</style>
