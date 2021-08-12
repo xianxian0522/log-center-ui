@@ -10,3 +10,7 @@ export interface BarItem {
   route?: string;
   children?: BarItem[];
 }
+export interface ValueResponse {
+  data: string[];
+  status: string;
+}

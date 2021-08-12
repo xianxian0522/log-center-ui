@@ -7,16 +7,27 @@
 
 <script lang="ts">
 import logCenterRepository from "@/api/logCenterRepository";
-import { onMounted } from "vue";
+import { onMounted, reactive, UnwrapRef } from "vue";
+import valueRepositories from "@/composable/ValueRepositories";
+
+export interface LabelState {
+  bizLabels: string[];
+  appLabels: string[];
+}
 
 export default {
   name: "LogCenter",
   setup() {
+    const { getValues } = valueRepositories()
+    const labelState: UnwrapRef<LabelState> = reactive({
+      bizLabels: [],
+      appLabels: [],
+    })
     const querySearchLog = async () => {
       try {
-        const value = {}
+        const params = {}
         const query = {limit: 100, searchContent: 'xxx'}
-        await logCenterRepository.queryLog(value, query)
+        await logCenterRepository.queryLog(params, query)
       } catch (e) {
         console.error(e)
       }
@@ -24,6 +35,14 @@ export default {
 
     onMounted(() => {
       // querySearchLog()
+      getValues('biz').then(data => {
+        labelState.bizLabels = data || []
+      })
+      getValues('app').then(data => {
+        labelState.appLabels = data || []
+      })
+
+      console.log(labelState)
     })
 
     return {
