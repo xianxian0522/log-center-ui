@@ -7,6 +7,7 @@
 import { defineComponent } from "vue";
 import { useRouter } from "vue-router";
 import logCenterRepository from "@/api/logCenterRepository";
+import tokenRepositories from "@/composable/tokenRepositories";
 
 export default defineComponent({
   name: "Middle",
@@ -17,7 +18,7 @@ export default defineComponent({
     const login = async () => {
       const data = await logCenterRepository.login()
       if (data?.token) {
-        localStorage.setItem('token', data?.token)
+        tokenRepositories(data?.token)
       }
     }
 

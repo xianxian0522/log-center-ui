@@ -9,6 +9,7 @@
 
 <script lang="ts">
 import logCenterRepository from "@/api/logCenterRepository";
+import tokenRepositories from "@/composable/tokenRepositories";
 
 export default {
   name: "Login",
@@ -18,6 +19,9 @@ export default {
         const data = await logCenterRepository.login()
         if (data?.url) {
           window.location.href = data.url
+        }
+        if (data?.token) {
+          tokenRepositories(data?.token)
         }
       } catch (e) {
         console.error(e)
