@@ -14,3 +14,29 @@ export interface ValueResponse {
   data: string[];
   status: string;
 }
+export interface LogCenterList {
+  time: string;
+  message: string;
+}
+export interface LogResultResponse {
+  stream: {
+    filename: string;
+    job: string;
+  },
+  values: [string, string][]
+}
+export interface LogSearchResponse {
+  lokiRes: {
+    data: {
+      result: LogResultResponse[];
+      resultType: string;
+      stats: {
+        ingester: {[key: string]: number};
+        store: {[key: string]: number};
+        summary: {[key: string]: number};
+      }
+    }
+    status: string;
+  }
+  shareUrl: string
+}

@@ -12,6 +12,7 @@
     "ant-design-vue": "^2.2.3",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "lodash": "^4.17.21",
     "menu-header-component": "^0.2.1",
     "moment": "^2.29.1",
     "vue": "^3.0.0",

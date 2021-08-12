@@ -64,5 +64,6 @@ export default defineComponent({
   background-color: #fff;
   border-left: 1px solid #DCDEE5;
   padding: 20px;
+  overflow: auto;
 }
 </style>
