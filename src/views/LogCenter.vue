@@ -49,11 +49,10 @@
       <template #name="{ text }">
         <a>{{ text }}</a>
       </template>
-<!--      <template #action="{ record }" >-->
-<!--        <div >-->
-<!--          <slot :action="record"></slot>-->
-<!--        </div>-->
-<!--      </template>-->
+      <template #message="{ record }">
+        <span>{{ record.message }}</span>
+        <a-button type="link" v-if="queryForm.searchContent">更多{{ record.time }}</a-button>
+      </template>
     </a-table>
   </div>
 </template>
@@ -92,7 +91,7 @@ export default {
     })
     const columns = [
       { dataIndex: 'time', key: 'time', title: '时间', fixed: 'left', width: 200},
-      { dataIndex: 'message', key: 'message', title: '信息',},
+      { dataIndex: 'message', key: 'message', title: '信息', slots: { customRender: 'message', }},
       // { title: '操作', key: 'action', fixed: 'right', slots: { customRender: 'action', }, align: 'center', width: 120},
     ]
     const logList = ref<LogCenterList[]>([])
