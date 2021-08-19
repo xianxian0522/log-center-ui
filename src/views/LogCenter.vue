@@ -55,8 +55,8 @@
       </template>
     </a-table>
 
-    <a-modal v-model:visible="modalVisible" title="添加标签" @ok="handleAddLabel" width="750px">
-      <TagForm v-for="(item, index) in modalForm" :key="JSON.stringify(item) + index" :startTime="queryForm.startTime" :endTime="queryForm.endTime" />
+    <a-modal v-model:visible="modalVisible" title="添加标签" width="750px" :footer="null">
+      <ModalFormEdit v-if="modalVisible" :startTime="queryForm.startTime" :endTime="queryForm.endTime" @handleAddLabel="handleAddLabel" />
     </a-modal>
   </div>
 </template>
@@ -68,22 +68,18 @@ import valueRepositories from "@/composable/ValueRepositories";
 import { message } from "ant-design-vue";
 import moment from "moment";
 import * as _ from "lodash";
-import { LabelValue, LogCenterList, LogResultResponse } from "@/utils/response";
-import TagForm from "@/components/TagForm.vue";
+import { LogCenterList, LogResultResponse } from "@/utils/response";
+import ModalFormEdit from "@/components/ModalFormEdit.vue";
 import { timeValue } from "@/composable/commonRepositories";
 
 export interface LabelState {
   bizLabels: string[];
   appLabels: string[];
 }
-export interface ModalState {
-  modalVisible: boolean,
-  modalForm: LabelValue[],
-}
 
 export default {
   name: "LogCenter",
-  components: { TagForm },
+  components: { ModalFormEdit },
   setup() {
     const { getValues } = valueRepositories()
     const labelState: UnwrapRef<LabelState> = reactive({
@@ -100,23 +96,23 @@ export default {
       startTime: null,
       endTime: null,
     })
+    const labelValue = ref<{[key: string]: string[]}>()
     const columns = [
       { dataIndex: 'time', key: 'time', title: '时间', fixed: 'left', width: 200},
       { dataIndex: 'message', key: 'message', title: '信息', slots: { customRender: 'message', }},
       // { title: '操作', key: 'action', fixed: 'right', slots: { customRender: 'action', }, align: 'center', width: 120},
     ]
     const logList = ref<LogCenterList[]>([])
-    const modalState: UnwrapRef<ModalState> = reactive({
-      modalVisible: false,
-      modalForm: [],
-    })
+    const modalVisible = ref(false)
 
     const addLabel = () => {
-      modalState.modalVisible = true
-      modalState.modalForm = [{label: '', value: []}]
+      modalVisible.value = true
     }
-    const handleAddLabel = () => {
-      console.log('label add')
+
+    const handleAddLabel = (obj: any) => {
+      modalVisible.value = false
+      labelValue.value = obj
+      console.log('label add', obj)
     }
     const refresh = async () => {
       try {
@@ -126,6 +122,7 @@ export default {
         const searchCondition = {
           biz: [searchForm.biz],
           app: [searchForm.app],
+          ...labelValue.value
         }
         const query = timeValue(queryForm)
         const data = await logCenterRepository.queryLog({ searchCondition }, query)
@@ -163,7 +160,7 @@ export default {
       logList,
       columns,
       ...toRefs(labelState),
-      ...toRefs(modalState),
+      modalVisible,
       addLabel,
       refresh,
       handleAddLabel,

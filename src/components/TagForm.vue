@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-form layout="inline" :model="formState" >
+    <a-form layout="inline" :model="formState" class="tag-form" >
       <a-form-item label="标签">
         <a-select
           v-model:value="formState.label"
@@ -43,8 +43,11 @@ export default {
   props: {
     endTime: Object,
     startTime: Object,
+    index: Number,
+    form: Object,
   },
-  setup(props: any) {
+  emits: ['addLabelValue'],
+  setup(props: any, { emit }: any) {
     const formState = reactive({
       label: undefined,
       value: [],
@@ -59,6 +62,7 @@ export default {
         endTime: props.endTime
       }
       const query = timeValue(form)
+      formState.value = []
       getValues(value, query).then(data => {
         labelValue.value = data || []
       })
@@ -67,9 +71,7 @@ export default {
       if (!formState.label || formState.value.length === 0) {
         return message.warning('标签不能为空')
       }
-      const obj: any = {}
-      obj[formState.label!] = formState.value
-      console.log(obj)
+      emit('addLabelValue', [formState, props.index, formState.label])
     }
     const queryLabel = async () => {
       try {
@@ -95,5 +97,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-
+.tag-form {
+  margin-bottom: 10px;
+}
 </style>
