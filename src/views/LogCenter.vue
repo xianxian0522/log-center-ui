@@ -56,20 +56,21 @@
     </a-table>
 
     <a-modal v-model:visible="modalVisible" title="添加标签" @ok="handleAddLabel" width="750px">
-      <TagForm v-for="(item, index) in modalForm" :key="JSON.stringify(item) + index" />
+      <TagForm v-for="(item, index) in modalForm" :key="JSON.stringify(item) + index" :startTime="queryForm.startTime" :endTime="queryForm.endTime" />
     </a-modal>
   </div>
 </template>
 
 <script lang="ts">
 import logCenterRepository from "@/api/logCenterRepository";
-import { onMounted, reactive, UnwrapRef, toRefs, ref } from "vue";
+import { onMounted, reactive, UnwrapRef, toRefs, ref, watch } from "vue";
 import valueRepositories from "@/composable/ValueRepositories";
 import { message } from "ant-design-vue";
 import moment from "moment";
 import * as _ from "lodash";
 import { LabelValue, LogCenterList, LogResultResponse } from "@/utils/response";
 import TagForm from "@/components/TagForm.vue";
+import { timeValue } from "@/composable/commonRepositories";
 
 export interface LabelState {
   bizLabels: string[];
@@ -126,13 +127,7 @@ export default {
           biz: [searchForm.biz],
           app: [searchForm.app],
         }
-        const query: any = {...queryForm}
-        if (queryForm.startTime) {
-          query.startTime = moment(queryForm.startTime).valueOf()
-        }
-        if (queryForm.endTime) {
-          query.endTime = moment(queryForm.endTime).valueOf()
-        }
+        const query = timeValue(queryForm)
         const data = await logCenterRepository.queryLog({ searchCondition }, query)
         const result = data.lokiRes.data.result.map((re: LogResultResponse) => re.values)
         const resultFlatten = _.flatten(result)
@@ -142,13 +137,24 @@ export default {
       }
     }
 
-    onMounted(() => {
-      getValues('biz').then(data => {
+    const queryValues = async () => {
+      const form = {
+        startTime: queryForm.startTime,
+        endTime: queryForm.endTime
+      }
+      const query = timeValue(form)
+      getValues('biz', query).then(data => {
         labelState.bizLabels = data || []
       })
-      getValues('app').then(data => {
+      getValues('app', query).then(data => {
         labelState.appLabels = data || []
       })
+    }
+    watch(() => [queryForm.startTime, queryForm.endTime], () => {
+      queryValues()
+    })
+    onMounted(() => {
+      queryValues()
     })
 
     return {

@@ -25,7 +25,7 @@
         </a-select>
       </a-form-item>
       <a-form-item>
-        <a-button>添加</a-button>
+        <a-button @click="addLabelValue">添加</a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -35,10 +35,16 @@
 import { onMounted, reactive, ref } from "vue";
 import logCenterRepository from "@/api/logCenterRepository";
 import valueRepositories from "@/composable/ValueRepositories";
+import { timeValue } from "@/composable/commonRepositories";
+import { message } from "ant-design-vue";
 
 export default {
   name: "TagForm",
-  setup() {
+  props: {
+    endTime: Object,
+    startTime: Object,
+  },
+  setup(props: any) {
     const formState = reactive({
       label: undefined,
       value: [],
@@ -48,9 +54,22 @@ export default {
     const { getValues } = valueRepositories()
 
     const handleLabelChange = (value: string) => {
-      getValues(value).then(data => {
+      const form = {
+        startTime: props.startTime,
+        endTime: props.endTime
+      }
+      const query = timeValue(form)
+      getValues(value, query).then(data => {
         labelValue.value = data || []
       })
+    }
+    const addLabelValue = () => {
+      if (!formState.label || formState.value.length === 0) {
+        return message.warning('标签不能为空')
+      }
+      const obj: any = {}
+      obj[formState.label!] = formState.value
+      console.log(obj)
     }
     const queryLabel = async () => {
       try {
@@ -69,6 +88,7 @@ export default {
       labelValue,
       formState,
       handleLabelChange,
+      addLabelValue,
     }
   }
 };

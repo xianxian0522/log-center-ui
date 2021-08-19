@@ -9,6 +9,6 @@ export default {
   login: () => request.get<LoginResponse>(ApiLogin),
 
   queryLog: (params: any, query?: any) => request.post<LogSearchResponse>(`${ApiLog}/search`, params, query),
-  queryLabelsValue: (labelName: string) => request.get<ValueResponse>(`${ApiLog}/labels/values/${labelName}`),
+  queryLabelsValue: (labelName: string, params?: any) => request.get<ValueResponse>(`${ApiLog}/labels/values/${labelName}`, params),
   queryLabels: () => request.get<LabelsResponse>(`${ApiLog}/labels`),
 }
