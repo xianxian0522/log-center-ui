@@ -54,6 +54,10 @@
         <a-button type="link" v-if="queryForm.searchContent">更多{{ record.time }}</a-button>
       </template>
     </a-table>
+
+    <a-modal v-model:visible="modalVisible" title="添加标签" @ok="handleAddLabel" width="750px">
+      <TagForm v-for="(item, index) in modalForm" :key="JSON.stringify(item) + index" />
+    </a-modal>
   </div>
 </template>
 
@@ -64,15 +68,21 @@ import valueRepositories from "@/composable/ValueRepositories";
 import { message } from "ant-design-vue";
 import moment from "moment";
 import * as _ from "lodash";
-import { LogCenterList, LogResultResponse } from "@/utils/response";
+import { LabelValue, LogCenterList, LogResultResponse } from "@/utils/response";
+import TagForm from "@/components/TagForm.vue";
 
 export interface LabelState {
   bizLabels: string[];
   appLabels: string[];
 }
+export interface ModalState {
+  modalVisible: boolean,
+  modalForm: LabelValue[],
+}
 
 export default {
   name: "LogCenter",
+  components: { TagForm },
   setup() {
     const { getValues } = valueRepositories()
     const labelState: UnwrapRef<LabelState> = reactive({
@@ -95,9 +105,17 @@ export default {
       // { title: '操作', key: 'action', fixed: 'right', slots: { customRender: 'action', }, align: 'center', width: 120},
     ]
     const logList = ref<LogCenterList[]>([])
+    const modalState: UnwrapRef<ModalState> = reactive({
+      modalVisible: false,
+      modalForm: [],
+    })
 
     const addLabel = () => {
-      console.log('add')
+      modalState.modalVisible = true
+      modalState.modalForm = [{label: '', value: []}]
+    }
+    const handleAddLabel = () => {
+      console.log('label add')
     }
     const refresh = async () => {
       try {
@@ -139,8 +157,10 @@ export default {
       logList,
       columns,
       ...toRefs(labelState),
+      ...toRefs(modalState),
       addLabel,
       refresh,
+      handleAddLabel,
     }
   }
 };

@@ -40,3 +40,10 @@ export interface LogSearchResponse {
   }
   shareUrl: string
 }
+export interface LabelValue {
+  label: string;
+  value: string[];
+}
+export interface LabelsResponse {
+  Labels: string[];
+}

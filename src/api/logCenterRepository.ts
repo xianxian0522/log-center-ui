@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import { LoginResponse, LogSearchResponse, ValueResponse } from "@/utils/response";
+import { LabelsResponse, LoginResponse, LogSearchResponse, ValueResponse } from "@/utils/response";
 
 const ApiLogin = '/api/v1/sso/login'
 const API = '/api/log-center'
@@ -10,4 +10,5 @@ export default {
 
   queryLog: (params: any, query?: any) => request.post<LogSearchResponse>(`${ApiLog}/search`, params, query),
   queryLabelsValue: (labelName: string) => request.get<ValueResponse>(`${ApiLog}/labels/values/${labelName}`),
+  queryLabels: () => request.get<LabelsResponse>(`${ApiLog}/labels`),
 }
