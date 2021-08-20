@@ -66,7 +66,7 @@
             <LogContext :contextQuery="contextQuery" :contextParams="contextParams"/>
           </div>
           <span>{{ record.message }}</span>
-          <a-button class="hide-content" type="link" @click="showOrHideContent(record)" v-if="showContent">show content</a-button>
+          <a-button class="hide-content" type="link" @click="showOrHideContent(record)" v-if="showContent">{{ record.isShow ? 'hide' : 'show' }} content</a-button>
         </div>
       </template>
     </a-table>
@@ -245,5 +245,8 @@ export default {
 }
 .more-message-div {
   position: relative;
+}
+.log-add-label ::v-deep .ant-descriptions {
+  margin-top: 5px;
 }
 </style>

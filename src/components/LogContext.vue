@@ -1,28 +1,32 @@
 <template>
   <div>
     <div class="show-content-more-pre">
-      <div class="content-message">
-        <ul>
-          <li v-for="forward in forwardList" :key="forward.oldTime">
-            <div class="context-message">{{ forward.message }}</div>
-          </li>
-        </ul>
-      </div>
-      <div class="content-message-count">
-        <span class="content-message-count-span">Found 10 rows.</span>
-      </div>
+      <a-spin :spinning="spinning">
+        <div class="content-message">
+          <ul>
+            <li v-for="forward in forwardList" :key="forward.oldTime">
+              <div class="context-message">{{ forward.message }}</div>
+            </li>
+          </ul>
+        </div>
+        <div class="content-message-count">
+          <span class="content-message-count-span">Found 10 rows.</span>
+        </div>
+      </a-spin>
     </div>
     <div class="show-content-more">
-      <div class="content-message">
-        <ul>
-          <li v-for="backward in backwardList" :key="backward.oldTime">
-            <div class="context-message">{{ backward.message }}</div>
-          </li>
-        </ul>
-      </div>
-      <div class="content-message-count">
-        <span class="content-message-count-span">Found 10 rows.</span>
-      </div>
+      <a-spin :spinning="spinning">
+        <div class="content-message">
+          <ul>
+            <li v-for="backward in backwardList" :key="backward.oldTime">
+              <div class="context-message">{{ backward.message }}</div>
+            </li>
+          </ul>
+        </div>
+        <div class="content-message-count">
+          <span class="content-message-count-span">Found 10 rows.</span>
+        </div>
+      </a-spin>
     </div>
   </div>
 </template>
@@ -42,10 +46,13 @@ export default {
   setup(props: any) {
     const backwardList = ref<LogCenterList[]>([])
     const forwardList = ref<LogCenterList[]>([])
+    const spinning = ref(true)
 
     const queryContext = async () => {
       try {
+        spinning.value = true
         const data = await logCenterRepository.queryLogContext(props.contextParams, props.contextQuery)
+        spinning.value = false
         backwardList.value = flattenLogResult(data.backward.data.result)
         forwardList.value = flattenLogResult(data.forward.data.result)
       } catch (e) {
@@ -57,6 +64,7 @@ export default {
     })
 
     return {
+      spinning,
       backwardList,
       forwardList,
     }
