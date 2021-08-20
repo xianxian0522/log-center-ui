@@ -27,6 +27,17 @@
         <a-button @click="refresh">搜索</a-button>
       </a-form-item>
     </a-form>
+    <div class="log-title-label">添加的标签</div>
+    <div class="log-add-label">
+      <div v-if="labelValueList?.length === 0">
+        <a-empty :description="'暂无添加的标签'" :image="simpleImage" />
+      </div>
+      <a-descriptions v-else bordered>
+        <a-descriptions-item v-for="item in labelValueList" :key="item.label" :label="item.label">
+          <a-tag color="processing" v-for="value in item.value" :key="value">{{ value }}</a-tag>
+        </a-descriptions-item>
+      </a-descriptions>
+    </div>
     <div class="log-title-label">条件</div>
     <a-form layout="inline" :model="queryForm" class="log-form">
       <a-form-item label="搜索">
@@ -70,8 +81,8 @@
 import logCenterRepository from "@/api/logCenterRepository";
 import { onMounted, reactive, UnwrapRef, toRefs, ref, watch } from "vue";
 import valueRepositories from "@/composable/ValueRepositories";
-import { message } from "ant-design-vue";
-import { LogCenterList } from "@/utils/response";
+import { Empty, message } from "ant-design-vue";
+import { LabelValue, LogCenterList } from "@/utils/response";
 import ModalFormEdit from "@/components/ModalFormEdit.vue";
 import { flattenLogResult, timeValue } from "@/composable/commonRepositories";
 import LogContext from "@/components/LogContext.vue";
@@ -79,6 +90,7 @@ import LogContext from "@/components/LogContext.vue";
 export interface LabelState {
   bizLabels: string[];
   appLabels: string[];
+  labelValueList: LabelValue[]
 }
 
 export default {
@@ -89,6 +101,7 @@ export default {
     const labelState: UnwrapRef<LabelState> = reactive({
       bizLabels: [],
       appLabels: [],
+      labelValueList: [],
     })
     const searchForm = reactive({
       biz: undefined,
@@ -118,7 +131,9 @@ export default {
 
     const handleAddLabel = (obj: any) => {
       modalVisible.value = false
-      labelValue.value = obj
+      labelValue.value = obj?.[0]
+      labelState.labelValueList = obj?.[1]
+      labelState.labelValueList.pop()
       console.log('label add', obj)
     }
     const refresh = async () => {
@@ -190,6 +205,7 @@ export default {
       showContent,
       contextParams,
       contextQuery,
+      simpleImage: Empty.PRESENTED_IMAGE_SIMPLE,
       addLabel,
       refresh,
       handleAddLabel,
@@ -204,8 +220,8 @@ export default {
   font-size: 16px;
   font-weight: 700;
 }
-.log-form {
-  margin-bottom: 10px;
+.log-form, .log-add-label {
+  margin-bottom: 20px;
 }
 .log-table ::v-deep .ant-table-thead > tr > th, .log-table ::v-deep .ant-table-tbody > tr > td {
   white-space: pre-wrap;

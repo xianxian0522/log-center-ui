@@ -55,7 +55,7 @@ export default {
           obj[item.label] = item.value
         }
       })
-      emit('handleAddLabel', obj)
+      emit('handleAddLabel', [obj, modalState.modalLabel])
       console.log(modalState.modalLabel, obj)
     }
 

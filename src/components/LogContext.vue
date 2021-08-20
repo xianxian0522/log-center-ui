@@ -75,7 +75,7 @@ export default {
   position: absolute;
   width: calc(100% + 20px);
   left: -13px;
-  z-index: 1030;
+  z-index: 10;
   overflow: hidden;
   background: #fff;
   box-shadow: rgb(255 255 255) 0 0 10px;

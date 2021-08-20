@@ -5,13 +5,13 @@ import {
   Avatar,
   Button,
   ConfigProvider,
-  DatePicker,
-  Dropdown,
+  DatePicker, Descriptions,
+  Dropdown, Empty,
   Form,
   Input,
   Layout,
   Menu, Modal,
-  Select, Spin, Table
+  Select, Spin, Table, Tag
 } from "ant-design-vue";
 import HeaderComponent from 'menu-header-component/dist/menu-header-component.umd.js'
 import 'menu-header-component/dist/menu-header-component.css'
@@ -33,6 +33,9 @@ app.use(DatePicker)
 app.use(Table)
 app.use(Modal)
 app.use(Spin)
+app.use(Descriptions)
+app.use(Tag)
+app.use(Empty)
 
 app.use(HeaderComponent)
 
