@@ -51,7 +51,7 @@
       </template>
       <template #message="{ record }">
         <span>{{ record.message }}</span>
-        <a-button type="link" v-if="queryForm.searchContent">更多{{ record.time }}</a-button>
+        <a-button type="link" v-if="isMoreMessage">更多{{ record.time }}</a-button>
       </template>
     </a-table>
 
@@ -104,6 +104,7 @@ export default {
     ]
     const logList = ref<LogCenterList[]>([])
     const modalVisible = ref(false)
+    const isMoreMessage = ref(false)
 
     const addLabel = () => {
       modalVisible.value = true
@@ -126,9 +127,10 @@ export default {
         }
         const query = timeValue(queryForm)
         const data = await logCenterRepository.queryLog({ searchCondition }, query)
+        isMoreMessage.value = !!queryForm.searchContent
         const result = data.lokiRes.data.result.map((re: LogResultResponse) => re.values)
         const resultFlatten = _.flatten(result)
-        logList.value = resultFlatten.map(r => ({time: moment(parseInt(r?.[0], 10) / 1000000).format('YYYY-MM-DD HH:mm:ss'), message: r?.[1]}))
+        logList.value = resultFlatten.map(r => ({ time: moment(parseInt(r?.[0], 10) / 1000000).format('YYYY-MM-DD HH:mm:ss'),message: r?.[1], oldTime: r?.[0]}))
       } catch (e) {
         console.error(e)
       }
@@ -161,6 +163,7 @@ export default {
       columns,
       ...toRefs(labelState),
       modalVisible,
+      isMoreMessage,
       addLabel,
       refresh,
       handleAddLabel,

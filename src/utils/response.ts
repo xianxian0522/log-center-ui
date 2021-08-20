@@ -17,6 +17,7 @@ export interface ValueResponse {
 export interface LogCenterList {
   time: string;
   message: string;
+  oldTime: string;
 }
 export interface LogResultResponse {
   stream: {
