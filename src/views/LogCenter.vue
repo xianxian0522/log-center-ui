@@ -52,22 +52,7 @@
       <template #message="{ record }">
         <div class="more-message-div">
           <div v-if="record.isShow">
-            <div class="show-content-more-pre">
-              <div class="content-message">
-                内容=====
-              </div>
-              <div class="content-message-count">
-                <span class="content-message-count-span">Found 10 rows.</span>
-              </div>
-            </div>
-            <div class="show-content-more">
-              <div class="content-message">
-                内容=====
-              </div>
-              <div class="content-message-count">
-                <span class="content-message-count-span">Found 10 rows.</span>
-              </div>
-            </div>
+            <LogContext :contextQuery="contextQuery" :contextParams="contextParams"/>
           </div>
           <span>{{ record.message }}</span>
           <a-button class="hide-content" type="link" @click="showOrHideContent(record)" v-if="showContent">show content</a-button>
@@ -86,11 +71,10 @@ import logCenterRepository from "@/api/logCenterRepository";
 import { onMounted, reactive, UnwrapRef, toRefs, ref, watch } from "vue";
 import valueRepositories from "@/composable/ValueRepositories";
 import { message } from "ant-design-vue";
-import moment from "moment";
-import * as _ from "lodash";
-import { LogCenterList, LogResultResponse } from "@/utils/response";
+import { LogCenterList } from "@/utils/response";
 import ModalFormEdit from "@/components/ModalFormEdit.vue";
 import { flattenLogResult, timeValue } from "@/composable/commonRepositories";
+import LogContext from "@/components/LogContext.vue";
 
 export interface LabelState {
   bizLabels: string[];
@@ -99,7 +83,7 @@ export interface LabelState {
 
 export default {
   name: "LogCenter",
-  components: { ModalFormEdit },
+  components: { ModalFormEdit, LogContext },
   setup() {
     const { getValues } = valueRepositories()
     const labelState: UnwrapRef<LabelState> = reactive({
@@ -125,6 +109,8 @@ export default {
     const logList = ref<LogCenterList[]>([])
     const modalVisible = ref(false)
     const showContent = ref(false)
+    const contextParams = ref()
+    const contextQuery = ref()
 
     const addLabel = () => {
       modalVisible.value = true
@@ -170,8 +156,8 @@ export default {
         if (queryForm.limit) {
           query.limit = queryForm.limit
         }
-        logCenterRepository.queryLogContext({ searchCondition }, query)
-        console.log('====', searchCondition, query)
+        contextParams.value = { searchCondition }
+        contextQuery.value = query
       }
     }
     const queryValues = async () => {
@@ -202,6 +188,8 @@ export default {
       ...toRefs(labelState),
       modalVisible,
       showContent,
+      contextParams,
+      contextQuery,
       addLabel,
       refresh,
       handleAddLabel,
@@ -241,44 +229,5 @@ export default {
 }
 .more-message-div {
   position: relative;
-}
-.show-content-more-pre {
-  top: -260px;
-}
-.show-content-more {
-  top: 100%;
-}
-.show-content-more, .show-content-more-pre {
-  position: absolute;
-  width: calc(100% + 20px);
-  left: -13px;
-  height: 250px;
-  z-index: 1030;
-  overflow: hidden;
-  //background: rgb(24, 27, 31);
-  //box-shadow: rgb(0 0 0) 0 0 10px;
-  //border: 1px solid rgb(34, 37, 43);
-  background: #fff;
-  box-shadow: rgb(255 255 255) 0 0 10px;
-  border: 1px solid #eee;
-  border-radius: 4px;
-
-  .content-message {
-    height: 220px;
-    padding: 10px;
-  }
-  .content-message-count {
-    height: 30px;
-    padding: 0 10px;
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    //background: rgb(34, 37, 43);
-    background: #eee;
-
-    .content-message-count-span {
-      opacity: 0.6;
-    }
-  }
 }
 </style>

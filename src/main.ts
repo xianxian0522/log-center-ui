@@ -11,7 +11,7 @@ import {
   Input,
   Layout,
   Menu, Modal,
-  Select, Table
+  Select, Spin, Table
 } from "ant-design-vue";
 import HeaderComponent from 'menu-header-component/dist/menu-header-component.umd.js'
 import 'menu-header-component/dist/menu-header-component.css'
@@ -32,6 +32,7 @@ app.use(Select)
 app.use(DatePicker)
 app.use(Table)
 app.use(Modal)
+app.use(Spin)
 
 app.use(HeaderComponent)
 
