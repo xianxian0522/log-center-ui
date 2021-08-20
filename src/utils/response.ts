@@ -18,6 +18,7 @@ export interface LogCenterList {
   time: string;
   message: string;
   oldTime: string;
+  isShow: boolean;
 }
 export interface LogResultResponse {
   stream: {
@@ -26,20 +27,25 @@ export interface LogResultResponse {
   },
   values: [string, string][]
 }
-export interface LogSearchResponse {
-  lokiRes: {
-    data: {
-      result: LogResultResponse[];
-      resultType: string;
-      stats: {
-        ingester: {[key: string]: number};
-        store: {[key: string]: number};
-        summary: {[key: string]: number};
-      }
+export interface LogCommonResopnse {
+  data: {
+    result: LogResultResponse[];
+    resultType: string;
+    stats: {
+      ingester: {[key: string]: number};
+      store: {[key: string]: number};
+      summary: {[key: string]: number};
     }
-    status: string;
   }
+  status: string;
+}
+export interface LogSearchResponse {
+  lokiRes: LogCommonResopnse;
   shareUrl: string
+}
+export interface LogContextResponse {
+  backward: LogCommonResopnse;
+  forward: LogCommonResopnse;
 }
 export interface LabelValue {
   label: string;
