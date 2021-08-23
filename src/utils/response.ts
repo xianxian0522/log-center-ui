@@ -54,3 +54,12 @@ export interface LabelValue {
 export interface LabelsResponse {
   Labels: string[];
 }
+export interface GroupInfoItem {
+  id: number;
+  name: string;
+}
+export interface GroupInfo {
+  answer: {
+    [key: string]: GroupInfoItem[]
+  }
+}
