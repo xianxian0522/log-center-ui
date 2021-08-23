@@ -54,6 +54,10 @@ export interface LabelValue {
 export interface LabelsResponse {
   Labels: string[];
 }
+export interface InstanceResponse {
+  ID: number;
+  Name: string;
+}
 export interface GroupInfoItem {
   id: number;
   name: string;

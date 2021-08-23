@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 import {
-  GroupInfo,
+  GroupInfo, InstanceResponse,
   LabelsResponse,
   LogContextResponse,
   LoginResponse,
@@ -12,6 +12,7 @@ const ApiLogin = '/api/v1/sso/login'
 const API = '/api/log-center'
 const ApiLog = `${API}/log`
 const ApiGroup = `${API}/group`
+const ApiMonitor = `${API}/minitor`
 
 export default {
   login: () => request.get<LoginResponse>(ApiLogin),
@@ -23,4 +24,8 @@ export default {
   searchLog: (params: any) => request.get(`${ApiLog}/custom/search`, params),
 
   queryGroupInfo: () => request.get<GroupInfo>(`${ApiGroup}/info`),
+  queryAppInstance: (appId: number) => request.get<InstanceResponse[]>(`${ApiGroup}/instance`, {appId}),
+
+  queryMonitorInfo: (appId: number) => request.get(`${ApiMonitor}/info`, {appId}),
+  queryLogParseType: () => request.get<string[]>(`${ApiMonitor}/parsetype`),
 }
