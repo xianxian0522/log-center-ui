@@ -58,8 +58,11 @@ export interface GroupInfoItem {
   id: number;
   name: string;
 }
+export interface GroupInfoBiz {
+  app: GroupInfoItem[];
+  id: number;
+  name: string;
+}
 export interface GroupInfo {
-  answer: {
-    [key: string]: GroupInfoItem[]
-  }
+  answer: GroupInfoBiz[];
 }
