@@ -2,25 +2,25 @@
   <div>
     <a-form layout="inline" :model="queryForm" class="log-search">
       <a-form-item label="限制条数">
-        <a-input size="small" v-model:value="queryForm.limit" placeholder="默认1000条" />
+        <a-input @pressEnter="searchLog" size="small" v-model:value="queryForm.limit" placeholder="默认1000条" />
       </a-form-item>
       <a-form-item label="开始时间">
-        <a-date-picker v-model:value="queryForm.startTime" size="small" show-time placeholder="开始时间" />
+        <a-date-picker @change="searchLog" v-model:value="queryForm.startTime" size="small" show-time placeholder="开始时间" />
       </a-form-item>
       <a-form-item label="结束时间">
-        <a-date-picker v-model:value="queryForm.endTime" size="small" show-time placeholder="结束时间" />
+        <a-date-picker @change="searchLog" v-model:value="queryForm.endTime" size="small" show-time placeholder="结束时间" />
       </a-form-item>
     </a-form>
     <a-form :model="queryForm" class="log-search">
       <a-form-item label="LogQL">
-        <a-textarea v-model:value="queryForm.searchContent" placeholder="input LogQL" :rows="4" />
+        <a-textarea @pressEnter="searchLog" v-model:value="queryForm.searchContent" placeholder="input LogQL" :rows="4" />
       </a-form-item>
     </a-form>
   </div>
 </template>
 
 <script lang="ts">
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, watch } from "vue";
 import logCenterRepository from "@/api/logCenterRepository";
 import { timeValue } from "@/composable/commonRepositories";
 
@@ -35,9 +35,13 @@ export default {
     })
 
     const searchLog = async () => {
-      const query = timeValue(queryForm)
-      console.log('====', query)
-      await logCenterRepository.searchLog(query)
+      try {
+        const query = timeValue(queryForm)
+        console.log('====', query)
+        await logCenterRepository.searchLog(query)
+      } catch (e) {
+        console.error(e)
+      }
     }
     onMounted(() => {
       searchLog()
@@ -45,6 +49,7 @@ export default {
 
     return {
       queryForm,
+      searchLog,
     }
   }
 };
