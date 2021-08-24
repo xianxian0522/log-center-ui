@@ -54,22 +54,24 @@
       </a-form-item>
     </a-form>
 
-    <a-table class="log-table" :show-header="false" :columns="columns"
-             :pagination="false"
-             :data-source="logList" :rowKey="record => record.time + record.message">
-      <template #name="{ text }">
-        <a>{{ text }}</a>
-      </template>
-      <template #message="{ record }">
-        <div class="more-message-div">
-          <div v-if="record.isShow">
-            <LogContext :contextQuery="contextQuery" :contextParams="contextParams"/>
+    <a-spin :spinning="spinning">
+      <a-table class="log-table" :show-header="false" :columns="columns"
+               :pagination="false"
+               :data-source="logList" :rowKey="record => record.time + record.message">
+        <template #name="{ text }">
+          <a>{{ text }}</a>
+        </template>
+        <template #message="{ record }">
+          <div class="more-message-div">
+            <div v-if="record.isShow">
+              <LogContext :contextQuery="contextQuery" :contextParams="contextParams"/>
+            </div>
+            <span>{{ record.message }}</span>
+            <a-button class="hide-content" type="link" @click="showOrHideContent(record)" v-if="showContent">{{ record.isShow ? 'hide' : 'show' }} content</a-button>
           </div>
-          <span>{{ record.message }}</span>
-          <a-button class="hide-content" type="link" @click="showOrHideContent(record)" v-if="showContent">{{ record.isShow ? 'hide' : 'show' }} content</a-button>
-        </div>
-      </template>
-    </a-table>
+        </template>
+      </a-table>
+    </a-spin>
 
     <a-modal v-model:visible="modalVisible" title="添加标签" width="750px" :footer="null">
       <ModalFormEdit v-if="modalVisible" :startTime="queryForm.startTime" :endTime="queryForm.endTime" @handleAddLabel="handleAddLabel" />
@@ -119,6 +121,7 @@ export default {
       { dataIndex: 'message', key: 'message', title: '信息', slots: { customRender: 'message', }},
       // { title: '操作', key: 'action', fixed: 'right', slots: { customRender: 'action', }, align: 'center', width: 120},
     ]
+    const spinning = ref(false)
     const logList = ref<LogCenterList[]>([])
     const modalVisible = ref(false)
     const showContent = ref(false)
@@ -146,14 +149,17 @@ export default {
           app: [searchForm.app],
           ...labelValue.value
         }
+        spinning.value = true
         const query = timeValue(queryForm)
         const data = await logCenterRepository.queryLog({ searchCondition }, query)
         showContent.value = !!queryForm.searchContent
+        spinning.value = false
         logList.value = flattenLogResult(data.lokiRes.data.result)
         // const result = data.lokiRes.data.result.map((re: LogResultResponse) => re.values)
         // const resultFlatten = _.flatten(result)
         // logList.value = resultFlatten.map(r => ({ time: moment(parseInt(r?.[0], 10) / 1000000).format('YYYY-MM-DD HH:mm:ss'),message: r?.[1], oldTime: r?.[0], isShow: false}))
       } catch (e) {
+        spinning.value = false
         console.error(e)
       }
     }
@@ -199,6 +205,7 @@ export default {
       queryForm,
       searchForm,
       logList,
+      spinning,
       columns,
       ...toRefs(labelState),
       modalVisible,

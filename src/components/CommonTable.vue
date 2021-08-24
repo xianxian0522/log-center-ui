@@ -73,5 +73,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-
+.common-table {
+  margin-top: 20px;
+}
 </style>

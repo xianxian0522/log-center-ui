@@ -5,11 +5,13 @@
         <a-button @click="addConfiguration">添加</a-button>
       </template>
     </FormCommon>
-    <CommonTable :columns="columns" :data-source="logMonitorList">
-      <template v-slot:default="slotProps">
-        <a-button type="link" @click="updateConfiguration(slotProps.action)">编辑</a-button>
-      </template>
-    </CommonTable>
+    <a-spin :spinning="spinning" >
+      <CommonTable :columns="columns" :data-source="logMonitorList">
+        <template v-slot:default="slotProps">
+          <a-button type="link" @click="updateConfiguration(slotProps.action)">编辑</a-button>
+        </template>
+      </CommonTable>
+    </a-spin>
 
     <a-modal v-model:visible="modalVisible" :title="modalTitle" width="750px" :ok-button-props="{disabled: !modalIsValidate}" @ok="addConfigSubmit">
       <ConfigurationEdit ref="editRef" v-if="modalVisible" :mode="modalMode" :form="modalForm" @disabledChange="disabledChange" />
@@ -54,6 +56,7 @@ export default {
       { dataIndex: 'expresion', key: 'expresion', title: '表达式', slots: { customRender: 'tags', }},
       { title: '操作', key: 'action', fixed: 'right', slots: { customRender: 'action', }, align: 'center', width: 120}
     ]
+    const spinning = ref(false)
     const logMonitorList = ref<MonitorInfoResponse[]>([])
 
     const addConfiguration = () => {
@@ -89,8 +92,11 @@ export default {
     }
     const queryInfoList = async () => {
       try {
+        spinning.value = true
         logMonitorList.value = await logCenterRepository.queryMonitorInfo(searchForm)
+        spinning.value = false
       } catch (e) {
+        spinning.value = false
         console.error(e)
       }
     }
@@ -111,6 +117,7 @@ export default {
       logMonitorList,
       editRef,
       searchForm,
+      spinning,
       ...toRefs(modalState),
       addConfiguration,
       updateConfiguration,
