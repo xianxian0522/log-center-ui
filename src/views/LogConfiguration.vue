@@ -6,9 +6,9 @@
       </template>
     </FormCommon>
 
-    <a-modal v-model:visible="modalVisible" :title="modalTitle" width="750px" @ok="addConfigSubmit">
+    <a-modal v-model:visible="modalVisible" :title="modalTitle" width="750px" :ok-button-props="{disabled: !modalIsValidate}" @ok="addConfigSubmit">
       <FormCommon :form="modalForm" :layout="'horizontal'" @appChange="appQueryChange" />
-      <a-form :model="modalForm" :labelCol="{ span: 4 }" :wrapperCol="{ span: 18 }" >
+      <a-form ref="modalRef" :model="modalForm" :rules="rules" :labelCol="{ span: 4 }" :wrapperCol="{ span: 18 }" >
         <a-form-item label="表达式">
           <a-select
             v-model:value="modalForm.expresion"
@@ -19,7 +19,7 @@
           >
           </a-select>
         </a-form-item>
-        <a-form-item label="实例">
+        <a-form-item label="实例" name="instanceId">
           <a-select
             v-model:value="modalForm.instanceId"
             size="small"
@@ -48,10 +48,11 @@
 </template>
 
 <script lang="ts">
-import { onMounted, reactive, toRefs, UnwrapRef, watch } from "vue";
+import { onMounted, reactive, ref, toRefs, UnwrapRef, watch } from "vue";
 import logCenterRepository from "@/api/logCenterRepository";
 import FormCommon from "@/components/FormCommon.vue";
 import { InstanceResponse } from "@/utils/response";
+import { RuleObject, ValidateErrorEntity } from "ant-design-vue/es/form/interface";
 
 export interface ModalForm {
   bizId?: number;
@@ -66,6 +67,7 @@ export interface ModalState {
   modalTitle: string;
   parseTypeList: string[];
   instanceList: InstanceResponse[];
+  modalIsValidate: boolean;
 }
 
 export default {
@@ -80,7 +82,8 @@ export default {
       modalVisible: false,
       modalTitle: '',
       parseTypeList: [],
-      instanceList: []
+      instanceList: [],
+      modalIsValidate: false,
     })
     const modalForm: UnwrapRef<ModalForm> = reactive({
       bizId: undefined,
@@ -90,6 +93,20 @@ export default {
       logParseType: undefined,
       logPath: undefined
     })
+    const modalRef = ref()
+    const validateInstanceId = async (rule: RuleObject, value: string) => {
+      if (!modalForm.appId) {
+        return Promise.reject('请先选择应用')
+      }
+      if (!value) {
+        return Promise.reject('实例不能为空')
+      } else {
+        return Promise.resolve()
+      }
+    }
+    const rules = {
+      instanceId: [{ required: true, validator: validateInstanceId, trigger: 'blur' }]
+    }
 
     const getModalForm = (modal: ModalForm) => {
       modalForm.appId = modal?.appId
@@ -99,10 +116,23 @@ export default {
       modalForm.expresion = modal?.expresion
     }
     const addConfiguration = () => {
-      modalState.modalTitle = '新增配置'
-      modalState.modalVisible = true
-      getModalForm({})
-      queryParseType()
+      try {
+        modalState.modalTitle = '新增配置'
+        modalState.modalVisible = true
+        modalState.modalIsValidate = false
+        getModalForm({})
+        queryParseType()
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    const isValidate = () => {
+      modalRef.value?.validate().then(() => {
+        modalState.modalIsValidate = true
+      }).catch((err: ValidateErrorEntity<ModalForm>) => {
+        modalState.modalIsValidate = false
+        console.error(err)
+      })
     }
     const addConfigSubmit = () => {
       console.log('add con')
@@ -136,11 +166,16 @@ export default {
     onMounted(() => {
       // queryInfoList()
     })
+    watch(() => modalForm.instanceId, () => {
+      isValidate()
+    })
 
     return {
       searchForm,
       modalForm,
       ...toRefs(modalState),
+      rules,
+      modalRef,
       addConfiguration,
       addConfigSubmit,
       appQueryChange,
