@@ -6,16 +6,18 @@
           v-model:value="formState.bizId"
           :style="{width: layout === 'horizontal' ? '100%' : '200px'}"
           size="small"
+          :allowClear="isQuery"
           @change="bizChange"
           placeholder="请选择业务">
           <a-select-option v-for="item in bizList" :key="item.id">{{ item.name }}</a-select-option>
         </a-select>
       </a-form-item>
-      <a-form-item label="应用" :name="layout === 'horizontal' ? 'appId' : ''">
+      <a-form-item label="应用" :name="isQuery ? '' : 'appId'">
         <a-select
           v-model:value="formState.appId"
           :style="{width: layout === 'horizontal' ? '100%' : '200px'}"
           size="small"
+          :allowClear="isQuery"
           @change="appChange"
           placeholder="请选择业务">
           <a-select-option v-for="item in appList" :key="item.id">{{ item.name }}</a-select-option>
@@ -42,12 +44,13 @@ export default {
       type: String,
       default: 'inline'
     },
+    isQuery: Boolean,
   },
   emits: ['appChange', 'bizChange'],
   setup(props: any, {emit}: any) {
     const formState = reactive({
-      bizId: props.form?.bizId || undefined,
-      appId: props.form?.appId || undefined
+      bizId: undefined,
+      appId: undefined
     })
     const bizList = ref<GroupInfoBiz[]>([])
     const appList = ref<GroupInfoItem[]>([])
@@ -82,8 +85,13 @@ export default {
       }
     }
 
-    onMounted(() => {
-      queryGroupInfo()
+    onMounted(async () => {
+      await queryGroupInfo()
+      formState.bizId = props.form?.bizId
+      if (props?.form?.bizId) {
+        bizChange(props.form?.bizId)
+        formState.appId = props.form?.appId
+      }
     })
 
     return {

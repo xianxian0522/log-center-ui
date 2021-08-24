@@ -1,12 +1,12 @@
 <template>
   <div>
-    <FormCommon :form="searchForm" @appChange="appChange" @bizChange="bizChange">
+    <FormCommon :is-query="true" :form="searchForm" @appChange="appChange" @bizChange="bizChange">
       <template v-slot:addConfig>
         <a-button @click="addConfiguration">添加</a-button>
       </template>
     </FormCommon>
     <a-spin :spinning="spinning" >
-      <CommonTable :columns="columns" :data-source="logMonitorList">
+      <CommonTable :columns="columns" :data-source="logMonitorList" :is-pagination="true" :is-scroll="{x: 1500}">
         <template v-slot:default="slotProps">
           <a-button type="link" @click="updateConfiguration(slotProps.action)">编辑</a-button>
         </template>
@@ -49,7 +49,8 @@ export default {
     })
     const editRef = ref()
     const columns = [
-      { dataIndex: 'appName', key: 'appName', title: '应用名', fixed: 'left', width: 200},
+      { dataIndex: 'bizName', key: 'bizName', title: '业务名', fixed: 'left', width: 180 },
+      { dataIndex: 'appName', key: 'appName', title: '应用名', },
       { dataIndex: 'instanceName', key: 'instanceName', title: '实例'},
       { dataIndex: 'logPath', key: 'logPath', title: '路径'},
       { dataIndex: 'logParseType', key: 'logParseType', title: '解析类型'},
@@ -111,6 +112,9 @@ export default {
     const disabledChange = (value: boolean) => {
       modalState.modalIsValidate = value
     }
+    onMounted(() => {
+      queryInfoList()
+    })
 
     return {
       columns,

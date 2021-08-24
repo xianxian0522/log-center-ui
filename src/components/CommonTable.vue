@@ -2,8 +2,8 @@
   <div>
     <a-table class="common-table" :columns="columns" :data-source="dataSource" :rowKey="record => record.id"
              @change="paginationChange"
-             :scroll="{x: scrollX}"
-             :pagination="isPage ? isPagination : pagination">
+             :scroll="isScroll"
+             :pagination="isPagination ? pagination : false">
       <template #name="{ text }">
         <a>{{ text }}</a>
       </template>
@@ -34,15 +34,10 @@ export default {
   props: {
     columns: Array,
     dataSource: Array,
-    scrollX: {
-      type: String,
-      default: '1100px'
-    },
-    isPage: Boolean,
-    isPagination: Object,
+    isPagination: Boolean,
+    isScroll: Object,
   },
-  emits: ['paginationChange'],
-  setup(props: any, {emit}: any) {
+  setup() {
     const pagination = reactive({
       showSizeChanger: true,
       current: 1,
@@ -51,13 +46,8 @@ export default {
     const paginationChange = (page: TableState['pagination']) => {
       const pageNumber = page?.current as number
       const pageSize = page?.pageSize as number
-      if (props.isPage) {
-        console.log(pageNumber, pageSize)
-        emit('paginationChange', {pageNumber, pageSize})
-      } else {
-        pagination.current = pageNumber
-        pagination.pageSize = pageSize
-      }
+      pagination.current = pageNumber
+      pagination.pageSize = pageSize
     }
     const timeFormat = (value: string) => {
       return moment(value).format('YYYY-MM-DD HH:mm:ss')

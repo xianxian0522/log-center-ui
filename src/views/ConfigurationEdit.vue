@@ -1,6 +1,6 @@
 <template>
   <div>
-    <FormCommon :form="modalForm" :layout="'horizontal'" @appChange="appQueryChange" />
+    <FormCommon :form="modalForm" :layout="'horizontal'" @appChange="appQueryChange" @bizChange="bizQueryChange" />
     <a-form ref="modalRef" :model="modalForm" :rules="rules" :labelCol="{ span: 4 }" :wrapperCol="{ span: 18 }" >
       <a-form-item label="表达式">
         <a-select
@@ -119,6 +119,7 @@ export default {
     }
     const queryAppInstance = async (appId: number) => {
       try {
+        modalForm.instanceId = undefined
         modalState.instanceList = await logCenterRepository.queryAppInstance(appId)
       } catch (e) {
         console.error(e)
@@ -127,6 +128,9 @@ export default {
     const appQueryChange = (value: number) => {
       modalForm.appId = value
       queryAppInstance(value)
+    }
+    const bizQueryChange = (value: number) => {
+      modalForm.bizId = value
     }
     watch(() => [modalForm.instanceId, modalForm.logPath], () => {
       if (modalForm.instanceId && modalForm.logPath) {
@@ -149,6 +153,7 @@ export default {
       rules,
       modalRef,
       appQueryChange,
+      bizQueryChange,
       configSubmit,
     }
   }
