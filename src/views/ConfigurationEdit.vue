@@ -32,7 +32,7 @@
           <a-select-option v-for="item in parseTypeList" :key="item" :value="item">{{ item }}</a-select-option>
         </a-select>
       </a-form-item>
-      <a-form-item label="日志路径">
+      <a-form-item label="日志路径" name="logPath">
         <a-input size="small" v-model:value="modalForm.logPath" placeholder="日志路径" />
       </a-form-item>
     </a-form>
@@ -73,12 +73,12 @@ export default {
       instanceList: [],
     })
     const modalForm: UnwrapRef<ModalForm> = reactive({
-      bizId: props.form?.bizId || undefined,
-      appId: props.form?.appId || undefined,
-      expresion: props.form?.expresion || [],
-      instanceId: props.form?.instanceId || undefined,
-      logParseType: props.form?.logParseType || undefined,
-      logPath: props.form?.logPath || undefined
+      bizId: props.form?.bizId,
+      appId: props.form?.appId,
+      expresion: props.form?.expresion,
+      instanceId: props.form?.instanceId,
+      logParseType: props.form?.logParseType,
+      logPath: props.form?.logPath
     })
     const modalRef = ref()
     const validateInstanceId = async (rule: RuleObject, value: string) => {
@@ -92,12 +92,13 @@ export default {
       }
     }
     const rules = {
-      instanceId: [{ required: true, validator: validateInstanceId, trigger: 'blur' }]
+      instanceId: [{ required: true, validator: validateInstanceId, trigger: 'blur' }],
+      logPath: [{required: true, message: '路径不能为空', trigger: 'blur'}]
     }
 
     const configSubmit = async () => {
-      props.mode === 'edit' ? await logCenterRepository.addMonitorInfo(modalForm) :
-        await logCenterRepository.updateMonitorInfo(modalForm)
+      props.mode === 'edit' ? await logCenterRepository.updateMonitorInfo(modalForm) :
+        await logCenterRepository.addMonitorInfo(modalForm)
       console.log(modalForm, '-=[-=[--')
     }
     const isValidate = () => {
@@ -126,8 +127,12 @@ export default {
       modalForm.appId = value
       queryAppInstance(value)
     }
-    watch(() => modalForm.instanceId, () => {
-      isValidate()
+    watch(() => [modalForm.instanceId, modalForm.logPath], () => {
+      if (modalForm.instanceId && modalForm.logPath) {
+        isValidate()
+      } else {
+        emit('disabledChange', false)
+      }
     })
     onMounted(() => {
       queryParseType()
