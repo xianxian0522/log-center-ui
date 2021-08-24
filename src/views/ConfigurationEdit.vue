@@ -64,6 +64,7 @@ export default {
   components: { FormCommon },
   props: {
     form: Object,
+    mode: String,
   },
   emits: ['disabledChange'],
   setup(props: any, {emit}: any) {
@@ -95,6 +96,8 @@ export default {
     }
 
     const configSubmit = async () => {
+      props.mode === 'edit' ? await logCenterRepository.addMonitorInfo(modalForm) :
+        await logCenterRepository.updateMonitorInfo(modalForm)
       console.log(modalForm, '-=[-=[--')
     }
     const isValidate = () => {
