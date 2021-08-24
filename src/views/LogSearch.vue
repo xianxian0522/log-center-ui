@@ -59,7 +59,7 @@ export default {
       }
     }
     onMounted(() => {
-      searchLog()
+      // searchLog()
     })
 
     return {
