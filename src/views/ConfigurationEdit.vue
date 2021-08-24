@@ -74,6 +74,7 @@ export default {
       instanceList: [],
     })
     const modalForm: UnwrapRef<ModalForm> = reactive({
+      id: props.form?.id,
       bizId: props.form?.bizId,
       appId: props.form?.appId,
       expresion: props.form?.expresion,
@@ -100,7 +101,7 @@ export default {
     const configSubmit = async () => {
       props.mode === 'edit' ? await logCenterRepository.updateMonitorInfo(modalForm) :
         await logCenterRepository.addMonitorInfo(modalForm)
-      message.success(props.mode === 'edit' ? '新增成功' : '添加成功')
+      message.success(props.mode === 'edit' ? '修改成功' : '新增成功')
     }
     const isValidate = () => {
       modalRef.value?.validate().then(() => {

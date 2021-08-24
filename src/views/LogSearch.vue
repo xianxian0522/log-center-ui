@@ -11,21 +11,27 @@
         <a-date-picker @change="searchLog" v-model:value="queryForm.endTime" size="small" show-time placeholder="结束时间" />
       </a-form-item>
     </a-form>
-    <a-form :model="queryForm" class="log-search">
+    <a-form :model="queryForm">
       <a-form-item label="LogQL">
         <a-textarea @pressEnter="searchLog" v-model:value="queryForm.searchContent" placeholder="input LogQL" :rows="4" />
       </a-form-item>
     </a-form>
+    <a-spin :spinning="spinning">
+      <CommonTable :columns="columns" :data-source="logList"></CommonTable>
+    </a-spin>
   </div>
 </template>
 
 <script lang="ts">
-import { onMounted, reactive, watch } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 import logCenterRepository from "@/api/logCenterRepository";
-import { timeValue } from "@/composable/commonRepositories";
+import { flattenLogResult, timeValue } from "@/composable/commonRepositories";
+import { LogCenterList } from "@/utils/response";
+import CommonTable from "@/components/CommonTable.vue";
 
 export default {
   name: "LogSearch",
+  components: { CommonTable },
   setup() {
     const queryForm = reactive({
       searchContent: undefined,
@@ -33,13 +39,22 @@ export default {
       startTime: null,
       endTime: null,
     })
+    const columns = [
+      { dataIndex: 'time', key: 'time', title: '时间', fixed: 'left', width: 200},
+      { dataIndex: 'message', key: 'message', title: '信息', slots: { customRender: 'message', }},
+    ]
+    const logList = ref<LogCenterList[]>([])
+    const spinning = ref(false)
 
     const searchLog = async () => {
       try {
+        spinning.value = true
         const query = timeValue(queryForm)
-        console.log('====', query)
-        await logCenterRepository.searchLog(query)
+        const data = await logCenterRepository.searchLog(query)
+        logList.value = flattenLogResult(data.data.result)
+        spinning.value = false
       } catch (e) {
+        spinning.value = false
         console.error(e)
       }
     }
@@ -48,6 +63,9 @@ export default {
     })
 
     return {
+      columns,
+      logList,
+      spinning,
       queryForm,
       searchLog,
     }

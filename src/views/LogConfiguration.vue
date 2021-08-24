@@ -86,6 +86,7 @@ export default {
       try {
         await editRef.value?.configSubmit()
         modalState.modalVisible = false
+        await queryInfoList()
       } catch (e) {
         modalState.modalVisible = false
         console.error(e)
