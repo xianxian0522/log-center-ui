@@ -1,8 +1,8 @@
 <template>
   <div>
-    <a-table class="common-table" :columns="columns" :data-source="dataSource" :rowKey="record => record.id"
+    <a-table class="common-table" :columns="columns" :data-source="dataSource" :rowKey="record => record.id + JSON.stringify(record)"
              @change="paginationChange"
-             :scroll="isScroll"
+             :scroll="{x: scrollX}"
              :pagination="isPagination ? pagination : false">
       <template #name="{ text }">
         <a>{{ text }}</a>
@@ -35,7 +35,10 @@ export default {
     columns: Array,
     dataSource: Array,
     isPagination: Boolean,
-    isScroll: Object,
+    scrollX: {
+      type: String,
+      default: 'auto'
+    },
   },
   setup() {
     const pagination = reactive({

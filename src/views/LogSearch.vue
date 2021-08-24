@@ -17,7 +17,7 @@
       </a-form-item>
     </a-form>
     <a-spin :spinning="spinning">
-      <CommonTable :columns="columns" :data-source="logList"></CommonTable>
+      <CommonTable :columns="columns" :data-source="logList" ></CommonTable>
     </a-spin>
   </div>
 </template>
@@ -40,8 +40,8 @@ export default {
       endTime: null,
     })
     const columns = [
-      { dataIndex: 'time', key: 'time', title: '时间', fixed: 'left', width: 200},
-      { dataIndex: 'message', key: 'message', title: '信息', slots: { customRender: 'message', }},
+      { dataIndex: 'time', key: 'time', title: '时间',},
+      { dataIndex: 'message', key: 'message', title: '信息', },
     ]
     const logList = ref<LogCenterList[]>([])
     const spinning = ref(false)

@@ -6,7 +6,7 @@
       </template>
     </FormCommon>
     <a-spin :spinning="spinning" >
-      <CommonTable :columns="columns" :data-source="logMonitorList" :is-pagination="true" :is-scroll="{x: 1500}">
+      <CommonTable :columns="columns" :data-source="logMonitorList" :is-pagination="true" :scroll-x="'1500px'">
         <template v-slot:default="slotProps">
           <a-button type="link" @click="updateConfiguration(slotProps.action)">编辑</a-button>
         </template>
