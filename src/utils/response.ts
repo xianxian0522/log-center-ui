@@ -71,13 +71,12 @@ export interface GroupInfo {
   answer: GroupInfoBiz[];
 }
 export interface MonitorInfoResponse {
-  Active: boolean;
-  AppID: number;
-  ID: number;
-  Path: string;
+  active: boolean;
+  appId: number;
+  id: number;
+  logPath: string;
   appName: string;
-  instaceID: number;
+  instanceId: number;
   instanceName: string;
   logParseType: string;
-
 }

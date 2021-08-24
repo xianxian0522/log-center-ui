@@ -4,7 +4,7 @@ import {
   LabelsResponse,
   LogContextResponse,
   LoginResponse,
-  LogSearchResponse,
+  LogSearchResponse, MonitorInfoResponse,
   ValueResponse
 } from "@/utils/response";
 
@@ -26,7 +26,7 @@ export default {
   queryGroupInfo: () => request.get<GroupInfo>(`${ApiGroup}/info`),
   queryAppInstance: (appId: number) => request.get<InstanceResponse[]>(`${ApiGroup}/instance`, {appId}),
 
-  queryMonitorInfo: (params: any) => request.get(`${ApiMonitor}/info`, params),
+  queryMonitorInfo: (params: any) => request.get<MonitorInfoResponse[]>(`${ApiMonitor}/info`, params),
   addMonitorInfo: (params: any) => request.put(`${ApiMonitor}/info`, params),
   updateMonitorInfo: (params: any) => request.patch(`${ApiMonitor}/info`, params),
   queryLogParseType: () => request.get<string[]>(`${ApiMonitor}/parsetype`),

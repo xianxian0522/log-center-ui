@@ -77,7 +77,7 @@ export default {
       bizId: props.form?.bizId,
       appId: props.form?.appId,
       expresion: props.form?.expresion,
-      instanceId: props.form?.instanceId,
+      instanceId: undefined,
       logParseType: props.form?.logParseType,
       logPath: props.form?.logPath
     })
@@ -135,8 +135,12 @@ export default {
         emit('disabledChange', false)
       }
     })
-    onMounted(() => {
-      queryParseType()
+    onMounted(async () => {
+      await queryParseType()
+      if (props.form?.appId) {
+        await queryAppInstance(props.form.appId)
+        modalForm.instanceId = props.form?.instanceId
+      }
     })
 
     return {

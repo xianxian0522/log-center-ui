@@ -5,6 +5,11 @@
         <a-button @click="addConfiguration">添加</a-button>
       </template>
     </FormCommon>
+    <CommonTable :columns="columns" :data-source="logMonitorList">
+      <template v-slot:default="slotProps">
+        <a-button type="link" @click="updateConfiguration(slotProps.action)">编辑</a-button>
+      </template>
+    </CommonTable>
 
     <a-modal v-model:visible="modalVisible" :title="modalTitle" width="750px" :ok-button-props="{disabled: !modalIsValidate}" @ok="addConfigSubmit">
       <ConfigurationEdit ref="editRef" v-if="modalVisible" :mode="modalMode" :form="modalForm" @disabledChange="disabledChange" />
@@ -17,6 +22,8 @@ import { onMounted, reactive, ref, toRefs, UnwrapRef } from "vue";
 import logCenterRepository from "@/api/logCenterRepository";
 import FormCommon from "@/components/FormCommon.vue";
 import ConfigurationEdit from "@/views/ConfigurationEdit.vue";
+import { MonitorInfoResponse } from "@/utils/response";
+import CommonTable from "@/components/CommonTable.vue";
 
 export interface SearchForm {
   bizId?: number;
@@ -25,7 +32,7 @@ export interface SearchForm {
 
 export default {
   name: "LogConfiguration",
-  components: { FormCommon, ConfigurationEdit },
+  components: { FormCommon, ConfigurationEdit, CommonTable },
   setup() {
     const searchForm: UnwrapRef<SearchForm> = reactive({
       bizId: undefined,
@@ -39,6 +46,15 @@ export default {
       modalMode: ''
     })
     const editRef = ref()
+    const columns = [
+      { dataIndex: 'appName', key: 'appName', title: '应用名', fixed: 'left', width: 200},
+      { dataIndex: 'instanceName', key: 'instanceName', title: '实例'},
+      { dataIndex: 'logPath', key: 'logPath', title: '路径'},
+      { dataIndex: 'logParseType', key: 'logParseType', title: '解析类型'},
+      { dataIndex: 'expresion', key: 'expresion', title: '表达式', slots: { customRender: 'tags', }},
+      { title: '操作', key: 'action', fixed: 'right', slots: { customRender: 'action', }, align: 'center', width: 120}
+    ]
+    const logMonitorList = ref<MonitorInfoResponse[]>([])
 
     const addConfiguration = () => {
       try {
@@ -47,6 +63,17 @@ export default {
         modalState.modalIsValidate = false
         modalState.modalForm = {}
         modalState.modalMode = 'created'
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    const updateConfiguration = (ele: MonitorInfoResponse) => {
+      try {
+        modalState.modalTitle = '修改配置'
+        modalState.modalVisible = true
+        modalState.modalIsValidate = true
+        modalState.modalForm = ele
+        modalState.modalMode = 'edit'
       } catch (e) {
         console.error(e)
       }
@@ -62,8 +89,7 @@ export default {
     }
     const queryInfoList = async () => {
       try {
-        const data = await logCenterRepository.queryMonitorInfo(searchForm)
-        console.log(data)
+        logMonitorList.value = await logCenterRepository.queryMonitorInfo(searchForm)
       } catch (e) {
         console.error(e)
       }
@@ -81,10 +107,13 @@ export default {
     }
 
     return {
+      columns,
+      logMonitorList,
       editRef,
       searchForm,
       ...toRefs(modalState),
       addConfiguration,
+      updateConfiguration,
       addConfigSubmit,
       disabledChange,
       bizChange,

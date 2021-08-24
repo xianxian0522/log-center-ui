@@ -10,6 +10,11 @@
       <template #time="{ text }">
         <span>{{ timeFormat(text) }}</span>
       </template>
+      <template #tags="{ text }">
+        <span>
+          <a-tag v-for="tag in text" :key="tag" color="processing">{{ tag }}</a-tag>
+        </span>
+      </template>
       <template #action="{ record }" >
         <div >
           <slot :action="record"></slot>
