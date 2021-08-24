@@ -43,13 +43,12 @@ export default {
       default: 'inline'
     },
   },
-  emits: ['appChange'],
+  emits: ['appChange', 'bizChange'],
   setup(props: any, {emit}: any) {
     const formState = reactive({
       bizId: props.form?.bizId || undefined,
       appId: props.form?.appId || undefined
     })
-    console.log(props.form)
     const bizList = ref<GroupInfoBiz[]>([])
     const appList = ref<GroupInfoItem[]>([])
 
@@ -69,6 +68,7 @@ export default {
     const bizChange = (value: number) => {
       const data = bizList.value.filter((biz: GroupInfoBiz) => biz.id === value)?.[0]
       appList.value = data?.app
+      emit('bizChange', value)
     }
     const appChange = (value: number) => {
       emit('appChange', value)

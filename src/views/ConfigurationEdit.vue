@@ -45,6 +45,7 @@ import { onMounted, reactive, ref, toRefs, UnwrapRef, watch } from "vue";
 import { RuleObject, ValidateErrorEntity } from "ant-design-vue/es/form/interface";
 import logCenterRepository from "@/api/logCenterRepository";
 import FormCommon from "@/components/FormCommon.vue";
+import { message } from "ant-design-vue";
 
 export interface ModalForm {
   bizId?: number;
@@ -99,7 +100,7 @@ export default {
     const configSubmit = async () => {
       props.mode === 'edit' ? await logCenterRepository.updateMonitorInfo(modalForm) :
         await logCenterRepository.addMonitorInfo(modalForm)
-      console.log(modalForm, '-=[-=[--')
+      message.success(props.mode === 'edit' ? '新增成功' : '添加成功')
     }
     const isValidate = () => {
       modalRef.value?.validate().then(() => {

@@ -70,3 +70,14 @@ export interface GroupInfoBiz {
 export interface GroupInfo {
   answer: GroupInfoBiz[];
 }
+export interface MonitorInfoResponse {
+  Active: boolean;
+  AppID: number;
+  ID: number;
+  Path: string;
+  appName: string;
+  instaceID: number;
+  instanceName: string;
+  logParseType: string;
+
+}
