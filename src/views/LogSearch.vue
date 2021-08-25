@@ -16,19 +16,37 @@
         <a-textarea @pressEnter="searchLog" v-model:value="queryForm.searchContent" placeholder="input LogQL" :rows="4" />
       </a-form-item>
     </a-form>
-    <a-dropdown>
-      <a class="ant-dropdown-link" @click.prevent>
-        <a-button>
-          <ClockCircleOutlined />
-          <DownOutlined />
-          <div>111</div>
-        </a-button>
-      </a>
+    <a-dropdown :trigger="['click']">
+      <a-tooltip placement="bottom">
+        <template #title>
+          <div class="dropdown-time-title">
+            <div>2021-08-25 09:05:06</div>
+            <div>to</div>
+            <div>2021-08-25 10:30:26</div>
+          </div>
+        </template>
+        <a class="ant-dropdown-link" @click.prevent>
+          <a-button>
+            <ClockCircleOutlined />
+            <DownOutlined />
+          </a-button>
+        </a>
+      </a-tooltip>
       <template #overlay>
-        <div class="dropdown-time">
-          <div>2021-08-25 09:05:06</div>
-          <div>to</div>
-          <div>2021-08-25 10:30:26</div>
+        <div class="dropdown-time-show">
+          <div class="time-show-content">
+            <div class="time-show-time" @click.stop.prevent>
+              <a-form :model="queryForm" layout="vertical">
+                <a-form-item label="form">
+                  <a-date-picker style="width: 100%;" v-model:value="queryForm.startTime" size="small" show-time placeholder="开始时间" />
+                </a-form-item>
+                <a-form-item label="to">
+                  <a-date-picker style="width: 100%;" v-model:value="queryForm.endTime" size="small" show-time placeholder="结束时间" />
+                </a-form-item>
+              </a-form>
+            </div>
+            <div></div>
+          </div>
         </div>
       </template>
     </a-dropdown>
@@ -94,11 +112,33 @@ export default {
 .log-search {
   margin-bottom: 10px;
 }
-.dropdown-time {
-  background: #fff;
-  padding: 5px;
+.dropdown-time-title {
   text-align: center;
   font-size: 12px;
   margin-top: 5px;
+}
+.dropdown-time-show {
+  background: #ccc;
+  box-shadow: #ccc 0 10px 20px;
+  width: 546px;
+  border-radius: 5px;
+  border: 1px solid rgba(204, 204, 204, 0.07);
+  margin-top: 10px;
+  .time-show-content {
+    height: 381px;
+    display: flex;
+    .time-show-time {
+      display: flex;
+      flex-direction: column;
+      width: 60%;
+      overflow: hidden;
+      order: 0;
+      padding-right: 20%;
+      padding-left: 11px;
+    }
+  }
+}
+.ant-form-vertical .ant-form-item {
+  margin-bottom: 10px;
 }
 </style>

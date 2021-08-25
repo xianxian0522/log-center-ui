@@ -11,7 +11,7 @@ import {
   Input,
   Layout,
   Menu, Modal,
-  Select, Spin, Table, Tag
+  Select, Spin, Table, Tag, Tooltip
 } from "ant-design-vue";
 import HeaderComponent from 'menu-header-component/dist/menu-header-component.umd.js'
 import 'menu-header-component/dist/menu-header-component.css'
@@ -36,6 +36,7 @@ app.use(Spin)
 app.use(Descriptions)
 app.use(Tag)
 app.use(Empty)
+app.use(Tooltip)
 
 app.use(HeaderComponent)
 
