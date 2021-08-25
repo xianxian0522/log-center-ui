@@ -20,9 +20,9 @@
       <a-tooltip placement="bottom">
         <template #title>
           <div class="dropdown-time-title">
-            <div>2021-08-25 09:05:06</div>
+            <div>{{ queryForm.startTime }}</div>
             <div>to</div>
-            <div>2021-08-25 10:30:26</div>
+            <div>{{ queryForm.endTime }}</div>
           </div>
         </template>
         <a class="ant-dropdown-link" @click.prevent>
@@ -43,7 +43,7 @@
                                  @change="showStartTimeChange"
                                  @openChange="handleStartOpenChange"
                                  show-time placeholder="开始时间" >
-                    <span>{{ queryForm.startTime ? showStartTime : '选择开始时间' }}</span>
+                    <span style="display: inline-block; width: 100%;">{{ queryForm.startTime ? showStartTime : '选择开始时间' }}</span>
                   </a-date-picker>
                 </a-form-item>
                 <a-form-item label="to">
@@ -53,7 +53,7 @@
                                  @change="showEndTimeChange"
                                  @openChange="handleEndOpenChange"
                                  show-time placeholder="结束时间" >
-                    <span>{{ queryForm.endTime ? showEndTime : '选择结束时间' }}</span>
+                    <span style="display: inline-block; width: 100%;">{{ queryForm.endTime ? showEndTime : '选择结束时间' }}</span>
                   </a-date-picker>
                 </a-form-item>
               </a-form>
@@ -183,7 +183,7 @@ export default {
       showTime.endOpen = open
     }
     onMounted(() => {
-      // searchLog()
+      selectRangeTime(timeSelectRanges.value[2])
     })
 
     return {
