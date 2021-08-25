@@ -16,6 +16,22 @@
         <a-textarea @pressEnter="searchLog" v-model:value="queryForm.searchContent" placeholder="input LogQL" :rows="4" />
       </a-form-item>
     </a-form>
+    <a-dropdown>
+      <a class="ant-dropdown-link" @click.prevent>
+        <a-button>
+          <ClockCircleOutlined />
+          <DownOutlined />
+          <div>111</div>
+        </a-button>
+      </a>
+      <template #overlay>
+        <div class="dropdown-time">
+          <div>2021-08-25 09:05:06</div>
+          <div>to</div>
+          <div>2021-08-25 10:30:26</div>
+        </div>
+      </template>
+    </a-dropdown>
     <a-spin :spinning="spinning">
       <CommonTable :columns="columns" :data-source="logList" ></CommonTable>
     </a-spin>
@@ -28,10 +44,11 @@ import logCenterRepository from "@/api/logCenterRepository";
 import { flattenLogResult, timeValue } from "@/composable/commonRepositories";
 import { LogCenterList } from "@/utils/response";
 import CommonTable from "@/components/CommonTable.vue";
+import {ClockCircleOutlined, DownOutlined, } from '@ant-design/icons-vue'
 
 export default {
   name: "LogSearch",
-  components: { CommonTable },
+  components: { CommonTable, ClockCircleOutlined, DownOutlined },
   setup() {
     const queryForm = reactive({
       searchContent: undefined,
@@ -40,7 +57,7 @@ export default {
       endTime: null,
     })
     const columns = [
-      { dataIndex: 'time', key: 'time', title: '时间',},
+      { dataIndex: 'time', key: 'time', title: '时间', fixed: 'left', width: 200},
       { dataIndex: 'message', key: 'message', title: '信息', },
     ]
     const logList = ref<LogCenterList[]>([])
@@ -76,5 +93,12 @@ export default {
 <style scoped lang="less">
 .log-search {
   margin-bottom: 10px;
+}
+.dropdown-time {
+  background: #fff;
+  padding: 5px;
+  text-align: center;
+  font-size: 12px;
+  margin-top: 5px;
 }
 </style>

@@ -76,6 +76,9 @@ export interface MonitorInfoResponse {
   id: number;
   logPath: string;
   appName: string;
+  bizId: number;
+  bizName: string;
+  expression: string[];
   instanceId: number;
   instanceName: string;
   logParseType: string;

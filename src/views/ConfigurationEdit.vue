@@ -4,7 +4,7 @@
     <a-form ref="modalRef" :model="modalForm" :rules="rules" :labelCol="{ span: 4 }" :wrapperCol="{ span: 18 }" >
       <a-form-item label="表达式">
         <a-select
-          v-model:value="modalForm.expresion"
+          v-model:value="modalForm.expression"
           mode="tags"
           size="small"
           style="width: 100%"
@@ -50,7 +50,7 @@ import { message } from "ant-design-vue";
 export interface ModalForm {
   bizId?: number;
   appId?: number;
-  expresion?: string[];
+  expression?: string[];
   instanceId?: number;
   logParseType?: string;
   logPath?: string;
@@ -77,7 +77,7 @@ export default {
       id: props.form?.id,
       bizId: props.form?.bizId,
       appId: props.form?.appId,
-      expresion: props.form?.expresion,
+      expression: props.form?.expression,
       instanceId: undefined,
       logParseType: props.form?.logParseType,
       logPath: props.form?.logPath

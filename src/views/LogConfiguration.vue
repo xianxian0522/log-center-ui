@@ -54,7 +54,7 @@ export default {
       { dataIndex: 'instanceName', key: 'instanceName', title: '实例'},
       { dataIndex: 'logPath', key: 'logPath', title: '路径'},
       { dataIndex: 'logParseType', key: 'logParseType', title: '解析类型'},
-      { dataIndex: 'expresion', key: 'expresion', title: '表达式', slots: { customRender: 'tags', }},
+      { dataIndex: 'expression', key: 'expression', title: '表达式', slots: { customRender: 'tags', }},
       { title: '操作', key: 'action', fixed: 'right', slots: { customRender: 'action', }, align: 'center', width: 120}
     ]
     const spinning = ref(false)
