@@ -19,28 +19,32 @@
       <template #overlay>
         <div class="dropdown-time-show">
           <div class="time-show-content">
-            <div class="time-show-time" @click.stop.prevent>
-              <a-form layout="vertical">
-                <a-form-item label="form">
+            <div class="time-show-time" >
+              <div @click.stop>
+                <div class="time-select-range-absolute"><span class="time-select-title-span">Absolute time range</span></div>
+                <div class="show-time-date">
+                  <div>To</div>
                   <a-date-picker style="width: 100%;" v-model:value="startTime" size="small"
                                  :disabled-date="disabledStartDate"
                                  @change="showStartTimeChange"
                                  @openChange="handleStartOpenChange"
                                  show-time placeholder="开始时间" >
-                    <span style="display: inline-block; width: 100%;">{{ startTime ? showStartTime : '选择开始时间' }}</span>
+                    <span class="show-time-date-span">{{ startTime ? showStartTime : '选择开始时间' }}</span>
                   </a-date-picker>
-                </a-form-item>
-                <a-form-item label="to">
+                </div>
+                <div class="show-time-date">
+                  <div>Form</div>
                   <a-date-picker style="width: 100%;" v-model:value="endTime" size="small"
                                  :disabled-date="disabledEndDate"
                                  :open="endOpen"
                                  @change="showEndTimeChange"
                                  @openChange="handleEndOpenChange"
                                  show-time placeholder="结束时间" >
-                    <span style="display: inline-block; width: 100%;">{{ endTime ? showEndTime : '选择结束时间' }}</span>
+                    <span class="show-time-date-span">{{ endTime ? showEndTime : '选择结束时间' }}</span>
                   </a-date-picker>
-                </a-form-item>
-              </a-form>
+                </div>
+              </div>
+              <a-button type="primary">Apply time range</a-button>
             </div>
             <div class="time-select">
               <div class="time-select-title"><span class="time-select-title-span">Relative time ranges</span></div>
@@ -181,6 +185,12 @@ export default {
       order: 0;
       padding-right: 20%;
       padding-left: 11px;
+      padding-top: 9px;
+      border-right: 1px solid #ddd;
+
+      .ant-btn-primary {
+        border-radius: 4px;
+      }
     }
   }
   .time-select {
@@ -188,11 +198,6 @@ export default {
     flex: 1;
     .time-select-title {
       padding: 7px 9px;
-
-      .time-select-title-span {
-        font-size: 14px;
-        font-weight: 500;
-      }
     }
     .time-select-range {
       cursor: pointer;
@@ -202,10 +207,28 @@ export default {
     }
   }
 }
+.time-select-title-span {
+  font-size: 14px;
+  font-weight: 500;
+}
+.time-select-range-absolute {
+  margin-bottom: 11px;
+}
 .active {
   background: #bfbfbf;
 }
-.ant-form-vertical .ant-form-item {
-  margin-bottom: 10px;
+.show-time-date {
+  margin-bottom: 16px;
+  div {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .show-time-date-span {
+    display: inline-block;
+    width: 100%;
+    border: 1px solid #ddd;
+    padding: 0 8px;
+  }
 }
 </style>
