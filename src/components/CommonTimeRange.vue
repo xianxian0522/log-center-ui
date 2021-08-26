@@ -1,6 +1,6 @@
 <template>
   <div class="common-time-range">
-    <a-tooltip placement="bottom" @click="rangeClick">
+    <a-tooltip placement="bottom" @click.stop="rangeClick">
       <template #title>
         <div class="dropdown-time-title">
           <div>{{ changeTimeFormat(startTime) }}</div>
@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted, reactive, ref, toRefs } from "vue";
+import { onMounted, provide, reactive, ref, toRefs, watch } from "vue";
 import moment, { Moment } from "moment";
 import { ClockCircleOutlined, DownOutlined } from "@ant-design/icons-vue";
 import CommonDropdown from "@/components/CommonDropdown.vue";
@@ -71,6 +71,7 @@ export default {
         console.error(e)
       }
     }
+    provide('rangeVisibleChange', rangeClick)
 
     onMounted(() => {
       const date = moment()

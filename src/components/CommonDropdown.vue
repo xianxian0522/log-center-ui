@@ -1,5 +1,5 @@
 <template>
-  <div class="dropdown-time-show">
+  <div class="dropdown-time-show" ref="showDropdown">
     <div class="time-show-content">
       <div class="time-show-time" >
         <div @click.stop>
@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted, reactive, ref, toRefs } from "vue";
+import { inject, onBeforeUnmount, onMounted, reactive, ref, toRefs } from "vue";
 import moment, { Moment } from "moment";
 
 export interface TimeRange {
@@ -78,7 +78,8 @@ export default {
     })
     const startTime = ref<Moment>()
     const endTime = ref<Moment>()
-    console.log('-=-==', props.formTime, props.isRange)
+    const showDropdown = ref()
+    const rangeVisibleChange: any = inject('rangeVisibleChange')
 
     const getTime = () => {
       return  {
@@ -138,6 +139,12 @@ export default {
     const handleEndOpenChange = (open: boolean) => {
       showTime.endOpen = open
     }
+    const clickListener = (event: any) => {
+      const dateEle = document.querySelector('div.ant-calendar-picker-container')
+      if (!showDropdown.value?.contains(event.target) && !dateEle?.contains(event.target)) {
+        rangeVisibleChange()
+      }
+    }
     onMounted(() => {
       if (props.isRange) {
         const second = moment(props.formTime?.endTime).valueOf() - moment(props.formTime?.startTime).valueOf()
@@ -149,9 +156,15 @@ export default {
         startTime.value = props.formTime?.startTime
         showStartTimeChange(startTime.value!)
       }
+
+      document.addEventListener('click', clickListener)
+    })
+    onBeforeUnmount(() => {
+      document.removeEventListener('click', clickListener)
     })
 
     return {
+      showDropdown,
       endTime,
       startTime,
       timeSelectRanges,
