@@ -20,9 +20,9 @@
       <a-tooltip placement="bottom">
         <template #title>
           <div class="dropdown-time-title">
-            <div>{{ queryForm.startTime }}</div>
+            <div>{{ changeTimeFormat(queryForm.startTime) }}</div>
             <div>to</div>
-            <div>{{ queryForm.endTime }}</div>
+            <div>{{ changeTimeFormat(queryForm.endTime) }}</div>
           </div>
         </template>
         <a class="ant-dropdown-link" @click.prevent>
@@ -155,6 +155,9 @@ export default {
     const showEndTimeChange = (time: Moment) => {
       showTime.showEndTime = time.format('YYYY-MM-DD HH:mm:ss')
     }
+    const changeTimeFormat = (time: any) => {
+      return moment(time).format('YYYY-MM-DD HH:mm:ss')
+    }
     const selectRangeTime = (time: TimeRange) => {
       timeSelectRanges.value.forEach((item: TimeRange) => item.select = false)
       time.select = !time.select
@@ -197,6 +200,7 @@ export default {
       selectRangeTime,
       showStartTimeChange,
       showEndTimeChange,
+      changeTimeFormat,
       disabledStartDate,
       disabledEndDate,
       handleEndOpenChange,
