@@ -17,27 +17,7 @@
       </a-form-item>
     </a-form>
 
-    <CommonTimeRange />
-<!--    <a-dropdown :trigger="['click']" v-model:visible="rangeVisible">-->
-<!--      <a-tooltip placement="bottom">-->
-<!--        <template #title>-->
-<!--          <div class="dropdown-time-title">-->
-<!--            <div>{{ changeTimeFormat(queryForm.startTime) }}</div>-->
-<!--            <div>to</div>-->
-<!--            <div>{{ changeTimeFormat(queryForm.endTime) }}</div>-->
-<!--          </div>-->
-<!--        </template>-->
-<!--        <a class="ant-dropdown-link">-->
-<!--          <a-button>-->
-<!--            <ClockCircleOutlined />-->
-<!--            <DownOutlined />-->
-<!--          </a-button>-->
-<!--        </a>-->
-<!--      </a-tooltip>-->
-<!--      <template #overlay>-->
-<!--        <CommonTimeRange v-if="rangeVisible" :is-range="isRange" :form-time="queryForm" />-->
-<!--      </template>-->
-<!--    </a-dropdown>-->
+    <CommonTimeRange @changeQueryTime="changeQueryTime" />
     <a-spin :spinning="spinning">
       <CommonTable :columns="columns" :data-source="logList" ></CommonTable>
     </a-spin>
@@ -65,7 +45,6 @@ export default {
   components: {
     CommonTimeRange,
     CommonTable,
-    // ClockCircleOutlined, DownOutlined,
   },
   setup() {
     const queryForm: UnwrapRef<QueryForm> = reactive({
@@ -80,8 +59,6 @@ export default {
     ]
     const logList = ref<LogCenterList[]>([])
     const spinning = ref(false)
-    // const rangeVisible = ref(false)
-    // const isRange = ref(true)
 
     const searchLog = async () => {
       try {
@@ -95,15 +72,18 @@ export default {
         console.error(e)
       }
     }
+    const changeQueryTime = (obj: any) => {
+      queryForm.startTime = obj?.startTime
+      queryForm.endTime = obj?.endTime
+    }
 
     return {
       columns,
       logList,
       spinning,
       queryForm,
-      // rangeVisible,
-      // isRange,
       searchLog,
+      changeQueryTime,
     }
   }
 };

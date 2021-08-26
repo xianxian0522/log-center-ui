@@ -80,12 +80,18 @@ export default {
     const endTime = ref<Moment>()
     console.log('-=-==', props.formTime, props.isRange)
 
-    const changeTimeSelect = () => {
-      const obj = {
+    const getTime = () => {
+      return  {
         startTime: startTime.value,
         endTime: endTime.value
       }
-      emit('changeTimeSelect', obj)
+    }
+    const changeTimeSelect = () => {
+      try {
+        emit('changeTimeSelect', getTime())
+      } catch (e) {
+        console.error(e)
+      }
     }
     const changeQueryTime = (second: number) => {
       const date = moment()
@@ -109,7 +115,7 @@ export default {
       showTime.showEndTime = 'now'
 
       if (!noEmit) {
-        changeTimeSelect()
+        emit('changeTimeRange', getTime())
       }
     }
     const disabledStartDate = (startValue: Moment) => {
@@ -172,6 +178,9 @@ export default {
   border-radius: 5px;
   border: 1px solid rgba(204, 204, 204, 0.07);
   margin-top: 10px;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 500;
+
   .time-show-content {
     height: 381px;
     display: flex;
@@ -207,7 +216,7 @@ export default {
 }
 .time-select-title-span {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
 }
 .time-select-range-absolute {
   margin-bottom: 11px;
@@ -219,7 +228,7 @@ export default {
   margin-bottom: 16px;
   div {
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: 4px;
   }
   .show-time-date-span {

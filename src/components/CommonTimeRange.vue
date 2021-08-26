@@ -1,30 +1,26 @@
 <template>
-  <div>
-    <a-dropdown :trigger="['click']" v-model:visible="rangeVisible" @click.stop="rangeVisible = !rangeVisible">
-      <a-tooltip placement="bottom">
-        <template #title>
-          <div class="dropdown-time-title">
-            <div>{{ changeTimeFormat(startTime) }}</div>
-            <div>to</div>
-            <div>{{ changeTimeFormat(endTime) }}</div>
-          </div>
-        </template>
-        <a class="ant-dropdown-link">
-          <a-button>
-            <ClockCircleOutlined />
-            <DownOutlined />
-          </a-button>
-        </a>
-      </a-tooltip>
-      <template #overlay >
-        <CommonDropdown v-if="rangeVisible" @changeTimeRange="changeTimeRange" @changeTimeSelect="changeTimeSelect" :is-range="isRange" :form-time="{ startTime, endTime }"/>
+  <div class="common-time-range">
+    <a-tooltip placement="bottom" @click="rangeClick">
+      <template #title>
+        <div class="dropdown-time-title">
+          <div>{{ changeTimeFormat(startTime) }}</div>
+          <div>to</div>
+          <div>{{ changeTimeFormat(endTime) }}</div>
+        </div>
       </template>
-    </a-dropdown>
+      <a class="ant-dropdown-link">
+        <a-button>
+          <ClockCircleOutlined />
+          <DownOutlined />
+        </a-button>
+      </a>
+    </a-tooltip>
+    <CommonDropdown class="common-dropdown" v-if="rangeVisible" @changeTimeRange="changeTimeRange" @changeTimeSelect="changeTimeSelect" :is-range="isRange" :form-time="{ startTime, endTime }"/>
   </div>
 </template>
 
 <script lang="ts">
-import { onMounted, reactive, ref, toRefs, watch } from "vue";
+import { onMounted, reactive, ref, toRefs } from "vue";
 import moment, { Moment } from "moment";
 import { ClockCircleOutlined, DownOutlined } from "@ant-design/icons-vue";
 import CommonDropdown from "@/components/CommonDropdown.vue";
@@ -42,7 +38,8 @@ export default {
     ClockCircleOutlined, DownOutlined,
     CommonDropdown,
   },
-  setup() {
+  emits: ['changeQueryTime'],
+  setup(props: any, {emit}: any) {
     const startTime = ref<Moment>()
     const endTime = ref<Moment>()
     const rangeState = reactive({
@@ -65,6 +62,14 @@ export default {
       startTime.value = obj.startTime
       endTime.value = obj.endTime
       rangeState.rangeVisible = false
+      emit('changeQueryTime', obj)
+    }
+    const rangeClick = () => {
+      try {
+        rangeState.rangeVisible = !rangeState.rangeVisible
+      } catch (e) {
+        console.error(e)
+      }
     }
 
     onMounted(() => {
@@ -80,6 +85,7 @@ export default {
       changeTimeFormat,
       changeTimeSelect,
       changeTimeRange,
+      rangeClick,
     }
   }
 };
@@ -90,5 +96,12 @@ export default {
   text-align: center;
   font-size: 12px;
   margin-top: 5px;
+}
+.common-time-range {
+  position: relative;
+  .common-dropdown {
+    position: absolute;
+    z-index: 10;
+  }
 }
 </style>
