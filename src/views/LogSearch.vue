@@ -30,7 +30,7 @@ import logCenterRepository from "@/api/logCenterRepository";
 import { flattenLogResult, timeValue } from "@/composable/commonRepositories";
 import { LogCenterList } from "@/utils/response";
 import CommonTable from "@/components/CommonTable.vue";
-import { Moment } from "moment";
+import moment, { Moment } from "moment";
 import CommonTimeRange from "@/components/CommonTimeRange.vue";
 
 export interface QueryForm {
@@ -75,6 +75,7 @@ export default {
     const changeQueryTime = (obj: any) => {
       queryForm.startTime = obj?.startTime
       queryForm.endTime = obj?.endTime
+      searchLog()
     }
 
     return {
