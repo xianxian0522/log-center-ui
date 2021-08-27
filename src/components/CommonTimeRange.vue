@@ -77,6 +77,7 @@ export default {
       const date = moment()
       endTime.value = date
       startTime.value = moment(date.valueOf() - 30 * 60 * 1000)
+      emit('changeQueryTime', { startTime: startTime.value, endTime: endTime.value })
     })
 
     return {

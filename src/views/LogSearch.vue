@@ -4,20 +4,22 @@
       <a-form-item label="限制条数">
         <a-input @pressEnter="searchLog" size="small" v-model:value="queryForm.limit" placeholder="默认1000条" />
       </a-form-item>
-      <a-form-item label="开始时间">
-        <a-date-picker @change="searchLog" v-model:value="queryForm.startTime" size="small" show-time placeholder="开始时间" />
-      </a-form-item>
-      <a-form-item label="结束时间">
-        <a-date-picker @change="searchLog" v-model:value="queryForm.endTime" size="small" show-time placeholder="结束时间" />
+<!--      <a-form-item label="开始时间">-->
+<!--        <a-date-picker @change="searchLog" v-model:value="queryForm.startTime" size="small" show-time placeholder="开始时间" />-->
+<!--      </a-form-item>-->
+<!--      <a-form-item label="结束时间">-->
+<!--        <a-date-picker @change="searchLog" v-model:value="queryForm.endTime" size="small" show-time placeholder="结束时间" />-->
+<!--      </a-form-item>-->
+      <a-form-item label="时间">
+        <CommonTimeRange @changeQueryTime="changeQueryTime" />
       </a-form-item>
     </a-form>
     <a-form :model="queryForm">
       <a-form-item label="LogQL">
-        <a-textarea @pressEnter="searchLog" v-model:value="queryForm.searchContent" placeholder="input LogQL" :rows="4" />
+        <a-textarea @pressEnter="searchLog" v-model:value="queryForm.searchContent" placeholder="input LogQL, Enter" :rows="4" />
       </a-form-item>
     </a-form>
 
-    <CommonTimeRange @changeQueryTime="changeQueryTime" />
     <a-spin :spinning="spinning">
       <CommonTable :columns="columns" :data-source="logList" ></CommonTable>
     </a-spin>

@@ -40,18 +40,21 @@
     </div>
     <div class="log-title-label">条件</div>
     <a-form layout="inline" :model="queryForm" class="log-form">
+      <a-form-item label="时间">
+        <CommonTimeRange @changeQueryTime="changeQueryTime" />
+      </a-form-item>
       <a-form-item label="搜索">
         <a-input size="small" v-model:value="queryForm.searchContent" placeholder="搜索内容" />
       </a-form-item>
       <a-form-item label="限制条数">
         <a-input size="small" v-model:value="queryForm.limit" placeholder="默认1000条" />
       </a-form-item>
-      <a-form-item label="开始时间">
-        <a-date-picker v-model:value="queryForm.startTime" size="small" show-time placeholder="开始时间" />
-      </a-form-item>
-      <a-form-item label="结束时间">
-        <a-date-picker v-model:value="queryForm.endTime" size="small" show-time placeholder="结束时间" />
-      </a-form-item>
+<!--      <a-form-item label="开始时间">-->
+<!--        <a-date-picker v-model:value="queryForm.startTime" size="small" show-time placeholder="开始时间" />-->
+<!--      </a-form-item>-->
+<!--      <a-form-item label="结束时间">-->
+<!--        <a-date-picker v-model:value="queryForm.endTime" size="small" show-time placeholder="结束时间" />-->
+<!--      </a-form-item>-->
     </a-form>
 
     <a-spin :spinning="spinning">
@@ -88,6 +91,7 @@ import { LabelValue, LogCenterList } from "@/utils/response";
 import ModalFormEdit from "@/components/ModalFormEdit.vue";
 import { flattenLogResult, timeValue } from "@/composable/commonRepositories";
 import LogContext from "@/components/LogContext.vue";
+import CommonTimeRange from "@/components/CommonTimeRange.vue";
 
 export interface LabelState {
   bizLabels: string[];
@@ -97,7 +101,7 @@ export interface LabelState {
 
 export default {
   name: "LogCenter",
-  components: { ModalFormEdit, LogContext },
+  components: { ModalFormEdit, LogContext, CommonTimeRange },
   setup() {
     const { getValues } = valueRepositories()
     const labelState: UnwrapRef<LabelState> = reactive({
@@ -194,12 +198,11 @@ export default {
         labelState.appLabels = data || []
       })
     }
-    watch(() => [queryForm.startTime, queryForm.endTime], () => {
+    const changeQueryTime = (obj: any) => {
+      queryForm.startTime = obj?.startTime
+      queryForm.endTime = obj?.endTime
       queryValues()
-    })
-    onMounted(() => {
-      queryValues()
-    })
+    }
 
     return {
       queryForm,
@@ -217,6 +220,7 @@ export default {
       refresh,
       handleAddLabel,
       showOrHideContent,
+      changeQueryTime,
     }
   }
 };
