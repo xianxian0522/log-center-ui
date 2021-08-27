@@ -1,6 +1,6 @@
 #!/bin/sh
 
-npm config set registry=http://172.16.97.41:9000/repository/npm/
+npm config set registry http://172.16.97.41:9000/repository/npm/
 npm i
 npm run build
 
