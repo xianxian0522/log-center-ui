@@ -49,18 +49,12 @@
       <a-form-item label="限制条数">
         <a-input size="small" v-model:value="queryForm.limit" placeholder="默认1000条" />
       </a-form-item>
-<!--      <a-form-item label="开始时间">-->
-<!--        <a-date-picker v-model:value="queryForm.startTime" size="small" show-time placeholder="开始时间" />-->
-<!--      </a-form-item>-->
-<!--      <a-form-item label="结束时间">-->
-<!--        <a-date-picker v-model:value="queryForm.endTime" size="small" show-time placeholder="结束时间" />-->
-<!--      </a-form-item>-->
     </a-form>
 
     <a-spin :spinning="spinning">
       <a-table class="log-table" :show-header="false" :columns="columns"
                :pagination="false"
-               :data-source="logList" :rowKey="record => record.time + record.message">
+               :data-source="logList" :rowKey="record => record.oldTime + record.message">
         <template #name="{ text }">
           <a>{{ text }}</a>
         </template>
@@ -141,7 +135,6 @@ export default {
       labelValue.value = obj?.[0]
       labelState.labelValueList = obj?.[1]
       labelState.labelValueList.pop()
-      console.log('label add', obj)
     }
     const refresh = async () => {
       try {
