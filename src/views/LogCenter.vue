@@ -16,7 +16,7 @@
           v-model:value="searchForm.app"
           style="width: 200px"
           size="small"
-          placeholder="请选择业务">
+          placeholder="请选择应用">
           <a-select-option v-for="item in appLabels" :key="item">{{ item }}</a-select-option>
         </a-select>
       </a-form-item>
@@ -47,7 +47,7 @@
         <a-input size="small" v-model:value="queryForm.searchContent" placeholder="搜索内容" />
       </a-form-item>
       <a-form-item label="限制条数">
-        <a-input size="small" v-model:value="queryForm.limit" placeholder="默认1000条" />
+        <a-input size="small" v-model:value="queryForm.limit" placeholder="默认500条" />
       </a-form-item>
     </a-form>
 
