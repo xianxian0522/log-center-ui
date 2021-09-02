@@ -1,6 +1,9 @@
 <template>
   <div>
     <a-form layout="inline" :model="queryForm" class="log-search">
+      <a-form-item label="时间">
+        <CommonTimeRange @changeQueryTime="changeQueryTime" />
+      </a-form-item>
       <a-form-item label="限制条数">
         <a-input @pressEnter="searchLog" size="small" v-model:value="queryForm.limit" placeholder="默认1000条" />
       </a-form-item>
@@ -10,9 +13,6 @@
 <!--      <a-form-item label="结束时间">-->
 <!--        <a-date-picker @change="searchLog" v-model:value="queryForm.endTime" size="small" show-time placeholder="结束时间" />-->
 <!--      </a-form-item>-->
-      <a-form-item label="时间">
-        <CommonTimeRange @changeQueryTime="changeQueryTime" />
-      </a-form-item>
     </a-form>
     <a-form :model="queryForm">
       <a-form-item label="LogQL">
