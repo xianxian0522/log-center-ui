@@ -1,19 +1,23 @@
 <template>
-  <div @scroll="scrollEvent" :style="{height: screenHeight + 'px', overflowY: 'auto'}">
-    <table class="scroll-table" :style="{height: tableHeight + 'px'}">
-      <thead class="scroll-thead">
+  <div class="scroll" @scroll="scrollEvent" :style="{height: screenHeight + 'px'}">
+    <table class="scroll-table scroll-table-fixed">
+      <thead class="scroll-thead" >
       <tr>
         <th>时间</th>
         <th>信息</th>
       </tr>
       </thead>
-      <tbody class="scroll-tbody" :style="{transform: 'translateY(' + startOffset + 'px)'}">
-      <tr v-for="data in visibleData" :key="JSON.stringify(data)" :style="{height: itemSize + 'px'}">
-        <td>{{ data.time }}</td>
-        <td>{{ data.message }}</td>
-      </tr>
-      </tbody>
     </table>
+    <div :style="{height: tableHeight + 'px'}">
+      <table class="scroll-table" >
+        <tbody class="scroll-tbody" :style="{transform: getTransForm}">
+        <tr v-for="data in visibleData" :key="JSON.stringify(data)" :style="{height: itemSize + 'px'}">
+          <td>{{ data.time }}</td>
+          <td>{{ data.message }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -73,7 +77,10 @@ export default {
     }
     const scrollEvent = (event: any) => {
       let scrollTop = event.target.scrollTop
-      console.log(event, '====', scrollTop)
+      // console.log(event, '====', scrollTop)
+      tableState.start = Math.floor(scrollTop / props.itemSize)
+      tableState.end = tableState.start + visibleCount.value
+      tableState.startOffset = scrollTop - (scrollTop % props.itemSize)
     }
     onMounted(() => {
       tableState.end = tableState.start + visibleCount.value
@@ -82,6 +89,7 @@ export default {
     return {
       tableHeight,
       visibleData,
+      getTransForm,
       ...toRefs(tableState),
       handleResize,
       scrollEvent,
@@ -91,9 +99,16 @@ export default {
 </script>
 
 <style scoped lang="less">
+.scroll {
+  overflow-y: auto;
+}
 .scroll-table {
   width: 100%;
-  //overflow-y: scroll;
+}
+.scroll-table-fixed {
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 .scroll-thead > tr > th {
   color: rgba(0, 0, 0, 0.85);
@@ -107,7 +122,7 @@ export default {
   padding: 16px 16px;
   overflow-wrap: break-word;
 }
-.scroll-tbody > tr td:nth-of-type(1) {
+.scroll-tbody > tr td:nth-of-type(1), .scroll-thead > tr th:nth-of-type(1) {
   width: 200px;
 }
 .scroll-tbody > tr > td {
