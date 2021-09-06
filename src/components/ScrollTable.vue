@@ -1,6 +1,19 @@
 <template>
-  <div @scroll="scrollEvent" :style="{height: screenHeight}">
-    <div ></div>
+  <div @scroll="scrollEvent" :style="{height: screenHeight + 'px', overflowY: 'auto'}">
+    <table class="scroll-table" :style="{height: tableHeight + 'px'}">
+      <thead class="scroll-thead">
+      <tr>
+        <th>时间</th>
+        <th>信息</th>
+      </tr>
+      </thead>
+      <tbody class="scroll-tbody" :style="{transform: 'translateY(' + startOffset + 'px)'}">
+      <tr v-for="data in visibleData" :key="JSON.stringify(data)" :style="{height: itemSize + 'px'}">
+        <td>{{ data.time }}</td>
+        <td>{{ data.message }}</td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -59,7 +72,8 @@ export default {
       console.log(event, '----')
     }
     const scrollEvent = (event: any) => {
-      console.log(event, '====')
+      let scrollTop = event.target.scrollTop
+      console.log(event, '====', scrollTop)
     }
     onMounted(() => {
       tableState.end = tableState.start + visibleCount.value
@@ -77,5 +91,30 @@ export default {
 </script>
 
 <style scoped lang="less">
-
+.scroll-table {
+  width: 100%;
+  //overflow-y: scroll;
+}
+.scroll-thead > tr > th {
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 500;
+  text-align: left;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.3s ease;
+}
+.scroll-thead > tr > th, .scroll-tbody > tr > td {
+  padding: 16px 16px;
+  overflow-wrap: break-word;
+}
+.scroll-tbody > tr td:nth-of-type(1) {
+  width: 200px;
+}
+.scroll-tbody > tr > td {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.3s;
+}
+.scroll-tbody tr:hover {
+  background: #e6f7ff;
+}
 </style>

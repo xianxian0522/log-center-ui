@@ -14,8 +14,9 @@
       </a-form-item>
     </a-form>
 
-    <a-spin :spinning="spinning">
-      <CommonTable :columns="columns" :data-source="logList" ></CommonTable>
+    <a-spin :spinning="spinning" style="height: inherit">
+<!--      <CommonTable :columns="columns" :data-source="logList" ></CommonTable>-->
+      <ScrollTable :data-source="logList" />
     </a-spin>
   </div>
 </template>
@@ -28,6 +29,7 @@ import { LogCenterList } from "@/utils/response";
 import CommonTable from "@/components/CommonTable.vue";
 import moment, { Moment } from "moment";
 import CommonTimeRange from "@/components/CommonTimeRange.vue";
+import ScrollTable from "@/components/ScrollTable.vue";
 
 export interface QueryForm {
   searchContent?: string,
@@ -40,7 +42,8 @@ export default {
   name: "LogSearch",
   components: {
     CommonTimeRange,
-    CommonTable,
+    // CommonTable,
+    ScrollTable,
   },
   setup() {
     const queryForm: UnwrapRef<QueryForm> = reactive({
