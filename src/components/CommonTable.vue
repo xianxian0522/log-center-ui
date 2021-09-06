@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div >
     <a-table class="common-table" :columns="columns" :data-source="dataSource" :rowKey="record => record.id + JSON.stringify(record)"
              @change="paginationChange"
              :scroll="{x: scrollX}"
@@ -27,7 +27,7 @@
 <script lang="ts">
 import moment from "moment";
 import { TableState } from "ant-design-vue/es/table/interface";
-import { reactive } from "vue";
+import { reactive, computed, onMounted, toRefs } from "vue";
 
 export default {
   name: "CommonTable",
@@ -40,12 +40,13 @@ export default {
       default: 'auto'
     },
   },
-  setup() {
+  setup(props:any) {
     const pagination = reactive({
       showSizeChanger: true,
       current: 1,
       pageSize: 10,
     })
+
     const paginationChange = (page: TableState['pagination']) => {
       const pageNumber = page?.current as number
       const pageSize = page?.pageSize as number
