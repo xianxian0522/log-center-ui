@@ -51,7 +51,7 @@
       </a-form-item>
     </a-form>
 
-    <a-spin :spinning="spinning" style="height: 132px;">
+    <a-spin :spinning="spinning" >
       <ScrollTable :data-source="logList" :is-show-context="true">
         <template v-slot:default="{ logContext }">
           <div class="more-message-div">

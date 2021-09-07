@@ -47,7 +47,7 @@ export default {
     },
     screenAllHeight: {
       type: Number,
-      default: 750,
+      default: 500,
     },
     isShowContext: Boolean,
   },
@@ -57,7 +57,7 @@ export default {
       start: 0,
       end: 10,
       startOffset: 0,
-      screenHeight: 750,
+      screenHeight: 500,
     })
     const tableHeight = computed(() => {
       return logListData.value.length * props.itemSize
@@ -115,9 +115,9 @@ export default {
 <style scoped lang="less">
 .scroll {
   overflow-y: auto;
-  position: relative;
-  padding-top: 250px;
-  top: -250px;
+  //position: relative;
+  //padding-top: 250px;
+  //top: -250px;
 }
 .scroll-table {
   width: 100%;
