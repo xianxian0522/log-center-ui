@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted, onUpdated, reactive, ref, toRefs } from "vue";
+import { computed, onMounted, onUpdated, reactive, ref, toRefs, watch } from "vue";
 import { LogCenterList } from "@/utils/response";
 
 interface ItemPosition {
@@ -43,23 +43,24 @@ export default {
     },
   },
   setup(props: any) {
+    const logListData = ref<LogCenterList[]>(props.dataSource)
     const tableBodyRef = ref()
     const tableState = reactive({
       start: 0,
       end: 10,
       startOffset: 0,
-      screenHeight: 700,
+      screenHeight: 500,
       positions: [] as ItemPosition[],
     })
     const tableHeight = computed(() => {
       return tableState.positions[tableState.positions.length - 1]?.bottom
-      // return props.dataSource.length * props.itemSize
+      // return logListData.value.length * props.itemSize
     })
     const visibleCount = computed(() => {
       return Math.ceil(tableState.screenHeight / props.itemSize)
     })
     const visibleData = computed(() => {
-      return props.dataSource.slice(tableState.start, Math.min(tableState.end, props.dataSource.length))
+      return logListData.value.slice(tableState.start, Math.min(tableState.end, logListData.value.length))
     })
     const getTransForm = computed(() => {
       return `translateY(${tableState.startOffset}px)`
@@ -94,7 +95,6 @@ export default {
       tableState.start = Math.floor(scrollTop / props.itemSize)
       // tableState.start = getStartIndex(scrollTop)
       tableState.end = tableState.start + visibleCount.value
-      console.log(tableState.start, '===')
       // if(tableState.start >= 1){
       //   tableState.startOffset = tableState.positions[tableState.start - 1].bottom
       // } else{
@@ -103,7 +103,7 @@ export default {
       tableState.startOffset = scrollTop - (scrollTop % props.itemSize)
     }
     const initPositions = () => {
-      tableState.positions = props.dataSource.map((item: LogCenterList, index: number) => ({
+      tableState.positions = logListData.value.map((item: LogCenterList, index: number) => ({
         index, height: props.itemSize, top: index * props.itemSize,
         bottom: (index + 1) * props.itemSize
       }))
@@ -116,14 +116,13 @@ export default {
         let index = parseInt(node.id, 10)
         let oldHeight = tableState.positions[index].height
         let dValue = oldHeight - height
-        console.log(height, index, oldHeight, dValue)
         //存在差值
         if (dValue) {
           tableState.positions[index].bottom = tableState.positions[index].bottom - dValue
           tableState.positions[index].height = height
-          // for(let k = index + 1; k < tableState.positions.length; ++k) {
+          // for(let k = index + 1; k < tableState.positions.length; k++) {
           //   tableState.positions[k].top = tableState.positions[k - 1].bottom
-          //   tableState.positions[k].bottom = tableState.positions[k].bottom - height
+          //   tableState.positions[k].bottom = tableState.positions[k].bottom - dValue
           // }
         }
       })
@@ -134,6 +133,10 @@ export default {
     })
     onUpdated(() => {
       updatePositions()
+    })
+    watch(() => props.dataSource, (value) => {
+      console.log(value, '===')
+      logListData.value = value
     })
 
     return {
@@ -163,7 +166,7 @@ export default {
   position: -webkit-sticky;
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 1;
 }
 .scroll-thead > tr > th {
   color: rgba(0, 0, 0, 0.85);
@@ -176,6 +179,7 @@ export default {
 .scroll-thead > tr > th, .scroll-tbody > tr > td {
   padding: 16px 16px;
   overflow-wrap: break-word;
+  word-break: break-word;
 }
 .scroll-tbody > tr td:nth-of-type(1), .scroll-thead > tr th:nth-of-type(1) {
   width: 200px;

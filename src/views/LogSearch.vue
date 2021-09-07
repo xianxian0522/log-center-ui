@@ -74,7 +74,7 @@ export default {
         spinning.value = true
         const query = timeValue(queryForm)
         const data = await logCenterRepository.searchLog(query)
-        // logList.value = flattenLogResult(data.data.result)
+        logList.value = flattenLogResult(data.lokiRes.data.result)
         spinning.value = false
       } catch (e) {
         spinning.value = false

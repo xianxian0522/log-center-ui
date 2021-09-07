@@ -28,7 +28,19 @@ export interface LogResultResponse {
   },
   values: [string, string][]
 }
-export interface LogCommonResopnse {
+export interface LogSearchResponse {
+  endTime: string;
+  isBottom: boolean;
+  isTop: boolean;
+  lastPageStartTime: string;
+  limit: string;
+  lokiRes: LogCommonResponse;
+  nextPageStartTime: string;
+  shareUrl: string;
+  startTime: string;
+  total: number
+}
+export interface LogCommonResponse {
   data: {
     result: LogResultResponse[];
     resultType: string;
@@ -40,13 +52,9 @@ export interface LogCommonResopnse {
   }
   status: string;
 }
-export interface LogSearchResponse {
-  lokiRes: LogCommonResopnse;
-  shareUrl: string
-}
 export interface LogContextResponse {
-  backward: LogCommonResopnse;
-  forward: LogCommonResopnse;
+  backward: LogCommonResponse;
+  forward: LogCommonResponse;
 }
 export interface LabelValue {
   label: string;
