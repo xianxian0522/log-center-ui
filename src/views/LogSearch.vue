@@ -59,15 +59,15 @@ export default {
     const logList = ref<LogCenterList[]>([])
     const spinning = ref(false)
 
-    for (let index = 0; index < 500; index++) {
-      logList.value.push({
-        index: index,
-        time: moment() + '',
-        message: 'message' + index,
-        oldTime: moment().valueOf() + index + '',
-        isShow: true,
-      })
-    }
+    // for (let index = 0; index < 500; index++) {
+    //   logList.value.push({
+    //     index: index,
+    //     time: moment() + '',
+    //     message: 'message' + index,
+    //     oldTime: moment().valueOf() + index + '',
+    //     isShow: true,
+    //   })
+    // }
 
     const searchLog = async () => {
       try {

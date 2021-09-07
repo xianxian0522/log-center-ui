@@ -51,23 +51,34 @@
       </a-form-item>
     </a-form>
 
-    <a-spin :spinning="spinning">
-      <a-table class="log-table" :show-header="false" :columns="columns"
-               :pagination="false"
-               :data-source="logList" :rowKey="record => record.oldTime + record.message">
-        <template #name="{ text }">
-          <a>{{ text }}</a>
-        </template>
-        <template #message="{ record }">
+    <a-spin :spinning="spinning" style="height: 132px;">
+      <ScrollTable :data-source="logList" :is-show-context="true">
+        <template v-slot:default="{ logContext }">
           <div class="more-message-div">
-            <div v-if="record.isShow">
+            <div v-if="logContext.isShow">
               <LogContext :contextQuery="contextQuery" :contextParams="contextParams"/>
             </div>
-            <span>{{ record.message }}</span>
-            <a-button class="hide-content" type="link" @click="showOrHideContent(record)" v-if="showContent">{{ record.isShow ? 'hide' : 'show' }} content</a-button>
+            <span>{{ logContext.message }}</span>
+            <a-button class="hide-content" type="link" @click="showOrHideContent(logContext)" v-if="showContent">{{ logContext.isShow ? 'hide' : 'show' }} content</a-button>
           </div>
         </template>
-      </a-table>
+      </ScrollTable>
+<!--      <a-table class="log-table" :show-header="false" :columns="columns"-->
+<!--               :pagination="false"-->
+<!--               :data-source="logList" :rowKey="record => record.oldTime + record.message">-->
+<!--        <template #name="{ text }">-->
+<!--          <a>{{ text }}</a>-->
+<!--        </template>-->
+<!--        <template #message="{ record }">-->
+<!--          <div class="more-message-div">-->
+<!--            <div v-if="record.isShow">-->
+<!--              <LogContext :contextQuery="contextQuery" :contextParams="contextParams"/>-->
+<!--            </div>-->
+<!--            <span>{{ record.message }}</span>-->
+<!--            <a-button class="hide-content" type="link" @click="showOrHideContent(record)" v-if="showContent">{{ record.isShow ? 'hide' : 'show' }} content</a-button>-->
+<!--          </div>-->
+<!--        </template>-->
+<!--      </a-table>-->
     </a-spin>
 
     <a-modal v-model:visible="modalVisible" title="添加标签" width="750px" :footer="null">
@@ -86,6 +97,7 @@ import ModalFormEdit from "@/components/ModalFormEdit.vue";
 import { flattenLogResult, timeValue } from "@/composable/commonRepositories";
 import LogContext from "@/components/LogContext.vue";
 import CommonTimeRange from "@/components/CommonTimeRange.vue";
+import ScrollTable from "@/components/ScrollTable.vue";
 
 export interface LabelState {
   bizLabels: string[];
@@ -95,7 +107,7 @@ export interface LabelState {
 
 export default {
   name: "LogCenter",
-  components: { ModalFormEdit, LogContext, CommonTimeRange },
+  components: { ModalFormEdit, LogContext, CommonTimeRange, ScrollTable },
   setup() {
     const { getValues } = valueRepositories()
     const labelState: UnwrapRef<LabelState> = reactive({
@@ -227,24 +239,24 @@ export default {
 .log-form, .log-add-label {
   margin-bottom: 20px;
 }
-.log-table ::v-deep .ant-table-thead > tr > th, .log-table ::v-deep .ant-table-tbody > tr > td {
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-.log-table ::v-deep .ant-table-scroll {
-  overflow: inherit;
-}
-.log-table {
-  font-family: "Roboto Mono", monospace;
-  font-size: 12px;
-}
+//.log-table ::v-deep .ant-table-thead > tr > th, .log-table ::v-deep .ant-table-tbody > tr > td {
+//  white-space: pre-wrap;
+//  word-break: break-all;
+//}
+//.log-table ::v-deep .ant-table-scroll {
+//  overflow: inherit;
+//}
+//.log-table {
+//  font-family: "Roboto Mono", monospace;
+//  font-size: 12px;
+//}
 .hide-content {
   visibility: hidden;
 }
-.ant-table-tbody > tr {
+.scroll-tbody > tr {
   cursor: pointer;
 }
-.ant-table-tbody > tr:hover .hide-content {
+.scroll-tbody > tr:hover .hide-content {
   visibility: visible;
 }
 .more-message-div {
