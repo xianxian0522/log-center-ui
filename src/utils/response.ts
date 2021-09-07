@@ -15,6 +15,7 @@ export interface ValueResponse {
   status: string;
 }
 export interface LogCenterList {
+  index: number;
   time: string;
   message: string;
   oldTime: string;

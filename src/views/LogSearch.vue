@@ -61,6 +61,7 @@ export default {
 
     for (let index = 0; index < 500; index++) {
       logList.value.push({
+        index: index,
         time: moment() + '',
         message: 'message' + index,
         oldTime: moment().valueOf() + index + '',

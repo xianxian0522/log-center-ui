@@ -9,10 +9,10 @@
       </thead>
     </table>
     <div :style="{height: tableHeight + 'px'}">
-      <table class="scroll-table" >
+      <table class="scroll-table scroll-table-border" >
         <tbody ref="tableBodyRef" class="scroll-tbody" :style="{transform: getTransForm}">
 <!--        <tr v-for="data in visibleData" :key="JSON.stringify(data)" :style="{height: itemSize + 'px'}">-->
-        <tr v-for="data in visibleData" :key="JSON.stringify(data)" >
+        <tr v-for="(data) in visibleData" :key="JSON.stringify(data)" :id="data.index" >
           <td>{{ data.time }}</td>
           <td>{{ data.message }}</td>
         </tr>
@@ -64,10 +64,42 @@ export default {
     const getTransForm = computed(() => {
       return `translateY(${tableState.startOffset}px)`
     })
+    // 获取列表起始索引
+    const getStartIndex = (scrollTop = 0) => {
+      return binarySearch(tableState.positions, scrollTop)
+    }
+    // 二分法查找
+    const binarySearch = (list: ItemPosition[], value: number) => {
+      let start = 0
+      let end = list.length - 1
+      let tempIndex = 0
+      while(start <= end){
+        let midIndex = Math.floor((start + end) / 2)
+        let midValue = list[midIndex].bottom
+        if(midValue === value){
+          return midIndex + 1
+        } else if(midValue < value) {
+          start = midIndex + 1
+        } else if(midValue > value) {
+          if (tempIndex === 0 || tempIndex > midIndex) {
+            tempIndex = midIndex
+          }
+          end = end - 1
+        }
+      }
+      return tempIndex
+    }
     const scrollEvent = (event: any) => {
       let scrollTop = event.target.scrollTop
       tableState.start = Math.floor(scrollTop / props.itemSize)
+      // tableState.start = getStartIndex(scrollTop)
       tableState.end = tableState.start + visibleCount.value
+      console.log(tableState.start, '===')
+      // if(tableState.start >= 1){
+      //   tableState.startOffset = tableState.positions[tableState.start - 1].bottom
+      // } else{
+      //   tableState.startOffset = 0
+      // }
       tableState.startOffset = scrollTop - (scrollTop % props.itemSize)
     }
     const initPositions = () => {
@@ -79,17 +111,20 @@ export default {
     const updatePositions = () => {
       let nodes = tableBodyRef.value?.children
       nodes.forEach((node: HTMLDivElement)=> {
-        let rect = node.getBoundingClientRect();
-        let height = rect.height;
-        let index = +node.id.slice(1)
-        let oldHeight = tableState.positions[index].height;
-        let dValue = oldHeight - height;
-        //存在差值
+        let rect = node.getBoundingClientRect()
+        let height = rect.height
+        let index = parseInt(node.id, 10)
+        let oldHeight = tableState.positions[index].height
+        let dValue = oldHeight - height
         console.log(height, index, oldHeight, dValue)
+        //存在差值
         if (dValue) {
-          tableState.positions[index].bottom = tableState.positions[index].bottom - dValue;
-          tableState.positions[index].height = height;
-          // for(let k = index + 1;k
+          tableState.positions[index].bottom = tableState.positions[index].bottom - dValue
+          tableState.positions[index].height = height
+          // for(let k = index + 1; k < tableState.positions.length; ++k) {
+          //   tableState.positions[k].top = tableState.positions[k - 1].bottom
+          //   tableState.positions[k].bottom = tableState.positions[k].bottom - height
+          // }
         }
       })
     }
@@ -98,9 +133,6 @@ export default {
       initPositions()
     })
     onUpdated(() => {
-      // if (tableBodyRef.value?.current && visibleData.value.length > 0) {
-      //   updatePositions()
-      // }
       updatePositions()
     })
 
@@ -122,6 +154,10 @@ export default {
 }
 .scroll-table {
   width: 100%;
+}
+.scroll-table-border {
+  border-collapse: separate;
+  border-spacing: 0;
 }
 .scroll-table-fixed {
   position: -webkit-sticky;
