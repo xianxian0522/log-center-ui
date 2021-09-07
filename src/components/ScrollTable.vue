@@ -23,15 +23,8 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted, onUpdated, reactive, ref, toRefs, watch } from "vue";
+import { computed, onMounted, reactive, ref, toRefs, watch } from "vue";
 import { LogCenterList } from "@/utils/response";
-
-interface ItemPosition {
-  index: number; // 当前pos对应的元素的下标
-  top: number; // 顶部位置
-  bottom: number; // 底部位置
-  height: number; // 元素高度
-}
 
 export default {
   name: "ScrollTable",
@@ -41,6 +34,10 @@ export default {
       type: Number,
       default: 100,
     },
+    screenAllHeight: {
+      type: Number,
+      default: 500,
+    }
   },
   setup(props: any) {
     const logListData = ref<LogCenterList[]>(props.dataSource)
@@ -50,10 +47,8 @@ export default {
       end: 10,
       startOffset: 0,
       screenHeight: 500,
-      positions: [] as ItemPosition[],
     })
     const tableHeight = computed(() => {
-      // return tableState.positions[tableState.positions.length - 1]?.bottom
       return logListData.value.length * props.itemSize
     })
     const visibleCount = computed(() => {
@@ -81,37 +76,12 @@ export default {
       tableState.end = tableState.start + visibleCount.value
       tableState.startOffset = scrollTop - (scrollTop % props.itemSize)
     }
-    const initPositions = () => {
-      tableState.positions = logListData.value.map((item: LogCenterList, index: number) => ({
-        index, height: props.itemSize, top: index * props.itemSize,
-        bottom: (index + 1) * props.itemSize
-      }))
-    }
-    const updatePositions = () => {
-      let nodes = tableBodyRef.value?.children
-      nodes.forEach((node: HTMLDivElement)=> {
-        let rect = node.getBoundingClientRect()
-        let height = rect.height
-        let index = parseInt(node.id, 10)
-        let oldHeight = tableState.positions[index].height
-        let dValue = oldHeight - height
-        //存在差值
-        if (dValue) {
-          tableState.positions[index].bottom = tableState.positions[index].bottom - dValue
-          tableState.positions[index].height = height
-        }
-      })
-    }
     onMounted(() => {
       tableState.end = tableState.start + visibleCount.value
-      initPositions()
-    })
-    onUpdated(() => {
-      updatePositions()
+      tableState.screenHeight = props.screenAllHeight
     })
     watch(() => props.dataSource, (value) => {
       logListData.value = value
-      initPositions()
     })
 
     return {
