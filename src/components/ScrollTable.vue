@@ -10,8 +10,9 @@
     </table>
     <div :style="{height: tableHeight + 'px'}">
       <table class="scroll-table" >
-        <tbody class="scroll-tbody" :style="{transform: getTransForm}">
-        <tr v-for="data in visibleData" :key="JSON.stringify(data)" :style="{height: itemSize + 'px'}">
+        <tbody ref="tableBodyRef" class="scroll-tbody" :style="{transform: getTransForm}">
+<!--        <tr v-for="data in visibleData" :key="JSON.stringify(data)" :style="{height: itemSize + 'px'}">-->
+        <tr v-for="data in visibleData" :key="JSON.stringify(data)" >
           <td>{{ data.time }}</td>
           <td>{{ data.message }}</td>
         </tr>
@@ -22,7 +23,15 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted, reactive, toRefs } from "vue";
+import { computed, onMounted, onUpdated, reactive, ref, toRefs } from "vue";
+import { LogCenterList } from "@/utils/response";
+
+interface ItemPosition {
+  index: number; // 当前pos对应的元素的下标
+  top: number; // 顶部位置
+  bottom: number; // 底部位置
+  height: number; // 元素高度
+}
 
 export default {
   name: "ScrollTable",
@@ -31,37 +40,20 @@ export default {
     itemSize: {
       type: Number,
       default: 100,
-    }
-  },
-  directives: {
-    'resize': {
-      beforeMount: function(el: any, binding: any) {
-        let width = '', height = '';
-        function get() {
-          const elStyle = el.currentStyle ? el.currentStyle : document?.defaultView?.getComputedStyle(el, null);
-          if (width !== elStyle.width || height !== elStyle.height) {
-            binding.value({width, height});
-          }
-          width = elStyle.width;
-          height = elStyle.height;
-          console.log(width, height, '===')
-        }
-        el.__vueReize__ = setInterval(get, 16);
-      },
-      unmounted: function(el: any) {
-        clearInterval(el.__vueReize__);
-      }
-    }
+    },
   },
   setup(props: any) {
+    const tableBodyRef = ref()
     const tableState = reactive({
       start: 0,
       end: 10,
       startOffset: 0,
       screenHeight: 700,
+      positions: [] as ItemPosition[],
     })
     const tableHeight = computed(() => {
-      return props.dataSource.length * props.itemSize
+      return tableState.positions[tableState.positions.length - 1]?.bottom
+      // return props.dataSource.length * props.itemSize
     })
     const visibleCount = computed(() => {
       return Math.ceil(tableState.screenHeight / props.itemSize)
@@ -72,26 +64,52 @@ export default {
     const getTransForm = computed(() => {
       return `translateY(${tableState.startOffset}px)`
     })
-    const handleResize = (event: any) => {
-      console.log(event, '----')
-    }
     const scrollEvent = (event: any) => {
       let scrollTop = event.target.scrollTop
-      // console.log(event, '====', scrollTop)
       tableState.start = Math.floor(scrollTop / props.itemSize)
       tableState.end = tableState.start + visibleCount.value
       tableState.startOffset = scrollTop - (scrollTop % props.itemSize)
     }
+    const initPositions = () => {
+      tableState.positions = props.dataSource.map((item: LogCenterList, index: number) => ({
+        index, height: props.itemSize, top: index * props.itemSize,
+        bottom: (index + 1) * props.itemSize
+      }))
+    }
+    const updatePositions = () => {
+      let nodes = tableBodyRef.value?.children
+      nodes.forEach((node: HTMLDivElement)=> {
+        let rect = node.getBoundingClientRect();
+        let height = rect.height;
+        let index = +node.id.slice(1)
+        let oldHeight = tableState.positions[index].height;
+        let dValue = oldHeight - height;
+        //存在差值
+        console.log(height, index, oldHeight, dValue)
+        if (dValue) {
+          tableState.positions[index].bottom = tableState.positions[index].bottom - dValue;
+          tableState.positions[index].height = height;
+          // for(let k = index + 1;k
+        }
+      })
+    }
     onMounted(() => {
       tableState.end = tableState.start + visibleCount.value
+      initPositions()
+    })
+    onUpdated(() => {
+      // if (tableBodyRef.value?.current && visibleData.value.length > 0) {
+      //   updatePositions()
+      // }
+      updatePositions()
     })
 
     return {
+      tableBodyRef,
       tableHeight,
       visibleData,
       getTransForm,
       ...toRefs(tableState),
-      handleResize,
       scrollEvent,
     }
   }
@@ -106,6 +124,7 @@ export default {
   width: 100%;
 }
 .scroll-table-fixed {
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 10;
