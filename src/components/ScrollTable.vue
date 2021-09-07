@@ -53,53 +53,32 @@ export default {
       positions: [] as ItemPosition[],
     })
     const tableHeight = computed(() => {
-      return tableState.positions[tableState.positions.length - 1]?.bottom
-      // return logListData.value.length * props.itemSize
+      // return tableState.positions[tableState.positions.length - 1]?.bottom
+      return logListData.value.length * props.itemSize
     })
     const visibleCount = computed(() => {
       return Math.ceil(tableState.screenHeight / props.itemSize)
     })
     const visibleData = computed(() => {
-      return logListData.value.slice(tableState.start, Math.min(tableState.end, logListData.value.length))
+      // return logListData.value.slice(tableState.start, Math.min(tableState.end, logListData.value.length))
+      const start = tableState.start - aboveCount()
+      const end = tableState.end + belowCount()
+      return logListData.value.slice(start, end)
     })
     const getTransForm = computed(() => {
       return `translateY(${tableState.startOffset}px)`
     })
-    // 获取列表起始索引
-    const getStartIndex = (scrollTop = 0) => {
-      return binarySearch(tableState.positions, scrollTop)
+
+    const aboveCount = () => {
+      return Math.min(tableState.start, visibleCount.value)
     }
-    // 二分法查找
-    const binarySearch = (list: ItemPosition[], value: number) => {
-      let start = 0
-      let end = list.length - 1
-      let tempIndex = 0
-      while(start <= end){
-        let midIndex = Math.floor((start + end) / 2)
-        let midValue = list[midIndex].bottom
-        if(midValue === value){
-          return midIndex + 1
-        } else if(midValue < value) {
-          start = midIndex + 1
-        } else if(midValue > value) {
-          if (tempIndex === 0 || tempIndex > midIndex) {
-            tempIndex = midIndex
-          }
-          end = end - 1
-        }
-      }
-      return tempIndex
+    const belowCount = () => {
+      return Math.min(logListData.value.length - tableState.end, visibleCount.value)
     }
     const scrollEvent = (event: any) => {
       let scrollTop = event.target.scrollTop
       tableState.start = Math.floor(scrollTop / props.itemSize)
-      // tableState.start = getStartIndex(scrollTop)
       tableState.end = tableState.start + visibleCount.value
-      // if(tableState.start >= 1){
-      //   tableState.startOffset = tableState.positions[tableState.start - 1].bottom
-      // } else{
-      //   tableState.startOffset = 0
-      // }
       tableState.startOffset = scrollTop - (scrollTop % props.itemSize)
     }
     const initPositions = () => {
@@ -120,10 +99,6 @@ export default {
         if (dValue) {
           tableState.positions[index].bottom = tableState.positions[index].bottom - dValue
           tableState.positions[index].height = height
-          // for(let k = index + 1; k < tableState.positions.length; k++) {
-          //   tableState.positions[k].top = tableState.positions[k - 1].bottom
-          //   tableState.positions[k].bottom = tableState.positions[k].bottom - dValue
-          // }
         }
       })
     }
@@ -135,8 +110,8 @@ export default {
       updatePositions()
     })
     watch(() => props.dataSource, (value) => {
-      console.log(value, '===')
       logListData.value = value
+      initPositions()
     })
 
     return {
