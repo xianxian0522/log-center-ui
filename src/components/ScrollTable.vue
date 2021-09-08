@@ -79,38 +79,16 @@ export default {
     })
     const visibleData = computed(() => {
       return logListData.value.slice(tableState.start, Math.min(tableState.end, logListData.value.length))
-      // let start = tableState.start - aboveCount()
-      // let end = tableState.end + belowCount()
-      // // if (end === logListData.value.length) {
-      // //   start = end - visibleCount.value
-      // // }
-      // return logListData.value.slice(start, end)
     })
     const getTransForm = computed(() => {
       return `translateY(${tableState.startOffset}px)`
     })
-
-    const aboveCount = () => {
-      return Math.min(tableState.start, visibleCount.value)
-    }
-    const belowCount = () => {
-      return Math.min(logListData.value.length - tableState.end, visibleCount.value)
-    }
     const scrollEvent = (event: any) => {
       updatePositions()
       let scrollTop = event.target.scrollTop
-      // tableState.start = Math.floor(scrollTop / props.itemSize)
-      // tableState.end = tableState.start + visibleCount.value
-      // tableState.startOffset = scrollTop - (scrollTop % props.itemSize)
-      // console.log(tableState.start, tableState.end, logListData.value.length, '===', scrollTop, (scrollTop % props.itemSize))
       tableState.start = getStartIndex(scrollTop)
       tableState.end = tableState.start + visibleCount.value
-      // if(tableState.start >= 1){
       tableState.startOffset = tableState.positions[tableState.start]?.top
-      // }
-      // else{
-      //   tableState.startOffset = 0
-      // }
     }
     // 获取列表起始索引
     const getStartIndex = (scrollTop = 0) => {
