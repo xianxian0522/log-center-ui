@@ -13,10 +13,9 @@
         </thead>
       </table>
       <div class="scroll" @scroll="scrollEvent" :style="{height: screenHeight + 'px'}">
-        <div :style="{height: tableHeight + 'px'}" >
-          <div style="width: 0; float: left"></div>
+        <div >
           <table class="scroll-table scroll-table-border" >
-            <tbody class="scroll-tbody" :style="{transform: getTransForm}">
+            <tbody ref="tableBodyRef" class="scroll-tbody" :style="{transform: getTransForm}">
             <!--        <tr v-for="data in visibleData" :key="JSON.stringify(data)" :style="{height: itemSize + 'px'}">-->
             <tr v-for="(data) in visibleData" :key="JSON.stringify(data)" :id="data.index" >
               <td>{{ data.time }}</td>
@@ -36,9 +35,16 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted, reactive, ref, toRefs, watch } from "vue";
+import { computed, onMounted, onUpdated, reactive, ref, toRefs, watch } from "vue";
 import { LogCenterList } from "@/utils/response";
 import { Empty } from "ant-design-vue";
+
+interface ItemPosition {
+  index: number; // 当前pos对应的元素的下标
+  top: number; // 顶部位置
+  bottom: number; // 底部位置
+  height: number; // 元素高度
+}
 
 export default {
   name: "ScrollTable",
@@ -55,24 +61,30 @@ export default {
     isShowContext: Boolean,
   },
   setup(props: any) {
+    const tableBodyRef = ref()
     const logListData = ref<LogCenterList[]>(props.dataSource)
     const tableState = reactive({
       start: 0,
       end: 10,
       startOffset: 0,
       screenHeight: 500,
+      positions: [] as ItemPosition[],
     })
     const tableHeight = computed(() => {
-      return logListData.value.length * props.itemSize
+      return tableState.positions[tableState.positions.length - 1]?.bottom
+      // return logListData.value.length * props.itemSize
     })
     const visibleCount = computed(() => {
       return Math.ceil(tableState.screenHeight / props.itemSize)
     })
     const visibleData = computed(() => {
-      // return logListData.value.slice(tableState.start, Math.min(tableState.end, logListData.value.length))
-      const start = tableState.start - aboveCount()
-      const end = tableState.end + belowCount()
-      return logListData.value.slice(start, end)
+      return logListData.value.slice(tableState.start, Math.min(tableState.end, logListData.value.length))
+      // let start = tableState.start - aboveCount()
+      // let end = tableState.end + belowCount()
+      // // if (end === logListData.value.length) {
+      // //   start = end - visibleCount.value
+      // // }
+      // return logListData.value.slice(start, end)
     })
     const getTransForm = computed(() => {
       return `translateY(${tableState.startOffset}px)`
@@ -85,10 +97,75 @@ export default {
       return Math.min(logListData.value.length - tableState.end, visibleCount.value)
     }
     const scrollEvent = (event: any) => {
+      updatePositions()
       let scrollTop = event.target.scrollTop
-      tableState.start = Math.floor(scrollTop / props.itemSize)
+      // tableState.start = Math.floor(scrollTop / props.itemSize)
+      // tableState.end = tableState.start + visibleCount.value
+      // tableState.startOffset = scrollTop - (scrollTop % props.itemSize)
+      // console.log(tableState.start, tableState.end, logListData.value.length, '===', scrollTop, (scrollTop % props.itemSize))
+      tableState.start = getStartIndex(scrollTop)
       tableState.end = tableState.start + visibleCount.value
-      tableState.startOffset = scrollTop - (scrollTop % props.itemSize)
+      // if(tableState.start >= 1){
+        tableState.startOffset = tableState.positions[tableState.start]?.top
+      // }
+      // else{
+      //   tableState.startOffset = 0
+      // }
+      console.log(tableState.start, tableState.end, tableState.positions, '===', tableState.startOffset)
+    }
+    // 获取列表起始索引
+    const getStartIndex = (scrollTop = 0) => {
+      return binarySearch(tableState.positions, scrollTop)
+    }
+    // 二分法查找
+    const binarySearch = (list: ItemPosition[], value: number) => {
+      let start = 0
+      let end = list.length - 1
+      let tempIndex = 0
+      while(start <= end){
+        let midIndex = Math.floor((start + end) / 2)
+        let midValue = list[midIndex].bottom
+        if(midValue === value){
+          return midIndex + 1
+        } else if(midValue < value) {
+          start = midIndex + 1
+        } else if(midValue > value) {
+          if (tempIndex === 0 || tempIndex > midIndex) {
+            tempIndex = midIndex
+          }
+          end = end - 1
+        }
+      }
+      return tempIndex
+    }
+    const initPositions = () => {
+      tableState.positions = logListData.value.map((item: LogCenterList, index: number) => ({
+        index, height: props.itemSize, top: index * props.itemSize,
+        bottom: (index + 1) * props.itemSize
+      }))
+    }
+    const updatePositions = () => {
+      let nodes = tableBodyRef.value?.children
+      nodes?.forEach((node: HTMLDivElement)=> {
+        let rect = node.getBoundingClientRect()
+        let height = rect.height
+        let index = parseInt(node.id, 10)
+        let oldHeight = tableState.positions[index].height
+        let dValue = oldHeight - height
+        //存在差值
+        if (dValue) {
+          tableState.positions[index].height = height
+          if (index === 0) {
+            tableState.positions[index].bottom = height
+          } else {
+            tableState.positions[index].bottom = tableState.positions[index - 1].bottom + tableState.positions[index].height
+          }
+          for (let i = index + 1; i < logListData.value.length; i++ ) {
+            tableState.positions[i].top = tableState.positions[i - 1].bottom;
+            tableState.positions[i].bottom = tableState.positions[i - 1].bottom + tableState.positions[i].height
+          }
+        }
+      })
     }
     const changeScreenHeight = () => {
       tableState.screenHeight = logListData.value.length === 0 ? 382 : props.screenAllHeight
@@ -96,13 +173,20 @@ export default {
     onMounted(() => {
       tableState.end = tableState.start + visibleCount.value
       changeScreenHeight()
+      initPositions()
     })
+    onUpdated(() => {
+      updatePositions()
+    })
+
     watch(() => props.dataSource, (value) => {
       logListData.value = value
       changeScreenHeight()
+      initPositions()
     })
 
     return {
+      tableBodyRef,
       simpleImage: Empty.PRESENTED_IMAGE_SIMPLE,
       tableHeight,
       visibleData,
@@ -125,7 +209,7 @@ export default {
   scrollbar-width: none;
 }
 .scroll::-webkit-scrollbar {
-  width: 0;
+  //width: 0;
 }
 .scroll-table {
   width: 100%;
