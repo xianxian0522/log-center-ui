@@ -18,6 +18,7 @@
 <!--      <CommonTable :columns="columns" :data-source="logList" ></CommonTable>-->
       <ScrollTable :data-source="logList" />
     </a-spin>
+<!--    加上一页 下一页的button-->
   </div>
 </template>
 
