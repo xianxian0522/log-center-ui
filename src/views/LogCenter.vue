@@ -52,17 +52,37 @@
     </a-form>
 
     <a-spin :spinning="spinning" >
-      <ScrollTable :data-source="logList" :is-show-context="true">
-        <template v-slot:default="{ logContext }">
+      <vxe-table
+        border
+        show-overflow
+        highlight-hover-row
+        :scroll-y="{gt: 10}"
+        ref="xTable1"
+        height="500">
+        <vxe-column fixed="time" title="时间" width="100"></vxe-column>
+        <vxe-column field="message" title="信息" >
+          <template #default="{ row }">
           <div class="more-message-div">
-            <div v-if="logContext.isShow">
+            <div v-if="row.isShow">
               <LogContext :contextQuery="contextQuery" :contextParams="contextParams"/>
             </div>
-            <span>{{ logContext.message }}</span>
-            <a-button class="hide-content" type="link" @click="showOrHideContent(logContext)" v-if="showContent">{{ logContext.isShow ? 'hide' : 'show' }} content</a-button>
+            <span>{{ row.message }}</span>
+            <a-button class="hide-content" type="link" @click="showOrHideContent(row)" v-if="showContent">{{ row.isShow ? 'hide' : 'show' }} content</a-button>
           </div>
-        </template>
-      </ScrollTable>
+          </template>
+        </vxe-column>
+      </vxe-table>
+<!--      <ScrollTable :data-source="logList" :is-show-context="true">-->
+<!--        <template v-slot:default="{ logContext }">-->
+<!--          <div class="more-message-div">-->
+<!--            <div v-if="logContext.isShow">-->
+<!--              <LogContext :contextQuery="contextQuery" :contextParams="contextParams"/>-->
+<!--            </div>-->
+<!--            <span>{{ logContext.message }}</span>-->
+<!--            <a-button class="hide-content" type="link" @click="showOrHideContent(logContext)" v-if="showContent">{{ logContext.isShow ? 'hide' : 'show' }} content</a-button>-->
+<!--          </div>-->
+<!--        </template>-->
+<!--      </ScrollTable>-->
 <!--      <a-table class="log-table" :show-header="false" :columns="columns"-->
 <!--               :pagination="false"-->
 <!--               :data-source="logList" :rowKey="record => record.oldTime + record.message">-->
@@ -89,7 +109,7 @@
 
 <script lang="ts">
 import logCenterRepository from "@/api/logCenterRepository";
-import { onMounted, reactive, UnwrapRef, toRefs, ref, watch } from "vue";
+import { onMounted, reactive, UnwrapRef, toRefs, ref, watch, nextTick } from "vue";
 import valueRepositories from "@/composable/ValueRepositories";
 import { Empty, message } from "ant-design-vue";
 import { LabelValue, LogCenterList } from "@/utils/response";
@@ -98,6 +118,8 @@ import { flattenLogResult, timeValue } from "@/composable/commonRepositories";
 import LogContext from "@/components/LogContext.vue";
 import CommonTimeRange from "@/components/CommonTimeRange.vue";
 import ScrollTable from "@/components/ScrollTable.vue";
+import { VxeTableInstance } from "vxe-table";
+import XEUtils from "xe-utils";
 
 export interface LabelState {
   bizLabels: string[];
@@ -107,7 +129,10 @@ export interface LabelState {
 
 export default {
   name: "LogCenter",
-  components: { ModalFormEdit, LogContext, CommonTimeRange, ScrollTable },
+  components: {
+    ModalFormEdit, CommonTimeRange,
+    LogContext, // ScrollTable
+  },
   setup() {
     const { getValues } = valueRepositories()
     const labelState: UnwrapRef<LabelState> = reactive({
@@ -138,6 +163,8 @@ export default {
     const contextParams = ref()
     const contextQuery = ref()
 
+    const xTable1 = ref<VxeTableInstance>()
+
     const addLabel = () => {
       modalVisible.value = true
     }
@@ -164,6 +191,13 @@ export default {
         showContent.value = !!queryForm.searchContent
         spinning.value = false
         logList.value = flattenLogResult(data.lokiRes.data.result)
+
+        await nextTick(() => {
+          const $table = xTable1.value
+          if ($table) {
+            $table.loadData(XEUtils.clone(logList.value, true))
+          }
+        })
         // const result = data.lokiRes.data.result.map((re: LogResultResponse) => re.values)
         // const resultFlatten = _.flatten(result)
         // logList.value = resultFlatten.map(r => ({ time: moment(parseInt(r?.[0], 10) / 1000000).format('YYYY-MM-DD HH:mm:ss'),message: r?.[1], oldTime: r?.[0], isShow: false}))
@@ -210,6 +244,7 @@ export default {
     }
 
     return {
+      xTable1,
       queryForm,
       searchForm,
       logList,

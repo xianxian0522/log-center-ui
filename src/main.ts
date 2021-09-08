@@ -16,8 +16,11 @@ import {
 import HeaderComponent from 'menu-header-component/dist/menu-header-component.umd.js'
 import 'menu-header-component/dist/menu-header-component.css'
 
-const app = createApp(App)
+import 'xe-utils'
+import VXETable from "vxe-table";
+import 'vxe-table/lib/style.css'
 
+const app = createApp(App)
 app.use(router)
 
 app.use(Button)
@@ -37,6 +40,8 @@ app.use(Descriptions)
 app.use(Tag)
 app.use(Empty)
 app.use(Tooltip)
+
+app.use(VXETable)
 
 app.use(HeaderComponent)
 
