@@ -106,12 +106,11 @@ export default {
       tableState.start = getStartIndex(scrollTop)
       tableState.end = tableState.start + visibleCount.value
       // if(tableState.start >= 1){
-        tableState.startOffset = tableState.positions[tableState.start]?.top
+      tableState.startOffset = tableState.positions[tableState.start]?.top
       // }
       // else{
       //   tableState.startOffset = 0
       // }
-      console.log(tableState.start, tableState.end, tableState.positions, '===', tableState.startOffset)
     }
     // 获取列表起始索引
     const getStartIndex = (scrollTop = 0) => {
