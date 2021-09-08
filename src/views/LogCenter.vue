@@ -167,9 +167,6 @@ export default {
         showContent.value = !!queryForm.searchContent
         spinning.value = false
         logList.value = flattenLogResult(data.lokiRes.data.result)
-        // const result = data.lokiRes.data.result.map((re: LogResultResponse) => re.values)
-        // const resultFlatten = _.flatten(result)
-        // logList.value = resultFlatten.map(r => ({ time: moment(parseInt(r?.[0], 10) / 1000000).format('YYYY-MM-DD HH:mm:ss'),message: r?.[1], oldTime: r?.[0], isShow: false}))
       } catch (e) {
         spinning.value = false
         console.error(e)
