@@ -1,10 +1,10 @@
 <template>
-  <div class="scroll" @scroll="scrollEvent" :style="{height: screenHeight + 'px'}">
+  <div >
     <div v-if="logListData?.length === 0">
       <a-empty :description="'暂无数据'" :image="simpleImage" />
     </div>
     <div v-else>
-      <table class="scroll-table scroll-table-fixed" v-if="!isShowContext">
+      <table class="scroll-table" v-if="!isShowContext">
         <thead class="scroll-thead" >
         <tr>
           <th>时间</th>
@@ -12,21 +12,24 @@
         </tr>
         </thead>
       </table>
-      <div :style="{height: tableHeight + 'px'}">
-        <table class="scroll-table scroll-table-border" >
-          <tbody class="scroll-tbody" :style="{transform: getTransForm}">
-          <!--        <tr v-for="data in visibleData" :key="JSON.stringify(data)" :style="{height: itemSize + 'px'}">-->
-          <tr v-for="(data) in visibleData" :key="JSON.stringify(data)" :id="data.index" >
-            <td>{{ data.time }}</td>
-            <td>
-              <div v-if="!isShowContext">{{ data.message }}</div>
-              <div v-else>
-                <slot :logContext="data"></slot>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
+      <div class="scroll" @scroll="scrollEvent" :style="{height: screenHeight + 'px'}">
+        <div :style="{height: tableHeight + 'px'}" >
+          <div style="width: 0; float: left"></div>
+          <table class="scroll-table scroll-table-border" >
+            <tbody class="scroll-tbody" :style="{transform: getTransForm}">
+            <!--        <tr v-for="data in visibleData" :key="JSON.stringify(data)" :style="{height: itemSize + 'px'}">-->
+            <tr v-for="(data) in visibleData" :key="JSON.stringify(data)" :id="data.index" >
+              <td>{{ data.time }}</td>
+              <td>
+                <div v-if="!isShowContext">{{ data.message }}</div>
+                <div v-else>
+                  <slot :logContext="data"></slot>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -115,9 +118,14 @@ export default {
 <style scoped lang="less">
 .scroll {
   overflow-y: auto;
-  //position: relative;
-  //padding-top: 250px;
-  //top: -250px;
+  //margin-top: -260px;
+  //padding-top: 260px;
+  //box-sizing: content-box;
+
+  scrollbar-width: none;
+}
+.scroll::-webkit-scrollbar {
+  width: 0;
 }
 .scroll-table {
   width: 100%;
