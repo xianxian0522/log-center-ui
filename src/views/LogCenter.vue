@@ -24,7 +24,7 @@
         <a-button @click="addLabel">添加</a-button>
       </a-form-item>
       <a-form-item>
-        <a-button @click="refresh">搜索</a-button>
+        <a-button @click="searchQueryChange">搜索</a-button>
       </a-form-item>
     </a-form>
     <div class="log-title-label">添加的标签</div>
@@ -44,10 +44,10 @@
         <CommonTimeRange @changeQueryTime="changeQueryTime" />
       </a-form-item>
       <a-form-item label="搜索">
-        <a-input size="small" v-model:value="queryForm.searchContent" placeholder="搜索内容" />
+        <a-input size="small" @pressEnter="searchQueryChange" v-model:value="queryForm.searchContent" placeholder="搜索内容" />
       </a-form-item>
       <a-form-item label="限制条数">
-        <a-input size="small" v-model:value="queryForm.limit" placeholder="默认500条" />
+        <a-input size="small" @pressEnter="searchQueryChange" v-model:value="queryForm.limit" placeholder="默认1000条" />
       </a-form-item>
     </a-form>
 
@@ -63,22 +63,6 @@
           </div>
         </template>
       </ScrollTable>
-<!--      <a-table class="log-table" :show-header="false" :columns="columns"-->
-<!--               :pagination="false"-->
-<!--               :data-source="logList" :rowKey="record => record.oldTime + record.message">-->
-<!--        <template #name="{ text }">-->
-<!--          <a>{{ text }}</a>-->
-<!--        </template>-->
-<!--        <template #message="{ record }">-->
-<!--          <div class="more-message-div">-->
-<!--            <div v-if="record.isShow">-->
-<!--              <LogContext :contextQuery="contextQuery" :contextParams="contextParams"/>-->
-<!--            </div>-->
-<!--            <span>{{ record.message }}</span>-->
-<!--            <a-button class="hide-content" type="link" @click="showOrHideContent(record)" v-if="showContent">{{ record.isShow ? 'hide' : 'show' }} content</a-button>-->
-<!--          </div>-->
-<!--        </template>-->
-<!--      </a-table>-->
     </a-spin>
 
     <a-modal v-model:visible="modalVisible" title="添加标签" width="750px" :footer="null">
@@ -89,7 +73,7 @@
 
 <script lang="ts">
 import logCenterRepository from "@/api/logCenterRepository";
-import { onMounted, reactive, UnwrapRef, toRefs, ref, watch, nextTick } from "vue";
+import { reactive, UnwrapRef, toRefs, ref, } from "vue";
 import valueRepositories from "@/composable/ValueRepositories";
 import { Empty, message } from "ant-design-vue";
 import { LabelValue, LogCenterList, QueryForm } from "@/utils/response";
@@ -131,11 +115,7 @@ export default {
       nextPageStartTime: undefined,
     })
     const labelValue = ref<{[key: string]: string[]}>()
-    const columns = [
-      { dataIndex: 'time', key: 'time', title: '时间', fixed: 'left', width: 200},
-      { dataIndex: 'message', key: 'message', title: '信息', slots: { customRender: 'message', }},
-      // { title: '操作', key: 'action', fixed: 'right', slots: { customRender: 'action', }, align: 'center', width: 120},
-    ]
+
     const spinning = ref(false)
     const logList = ref<LogCenterList[]>([])
     const modalVisible = ref(false)
@@ -176,6 +156,11 @@ export default {
         console.error(e)
       }
     }
+    const searchQueryChange = () => {
+      queryForm.lastPageStartTime = undefined
+      queryForm.nextPageStartTime = undefined
+      refresh()
+    }
     const showOrHideContent = (log: LogCenterList) => {
       log.isShow = !log.isShow
       if (log.isShow) {
@@ -211,6 +196,9 @@ export default {
       queryForm.startTime = obj?.startTime
       queryForm.endTime = obj?.endTime
       queryValues()
+      if (searchForm.biz && searchForm.app) {
+        searchQueryChange()
+      }
     }
     const lastPageLog = (lastTime: string) => {
       queryForm.lastPageStartTime = lastTime
@@ -228,7 +216,6 @@ export default {
       searchForm,
       logList,
       spinning,
-      columns,
       ...toRefs(labelState),
       modalVisible,
       showContent,
@@ -237,7 +224,7 @@ export default {
       scrollTableRef,
       simpleImage: Empty.PRESENTED_IMAGE_SIMPLE,
       addLabel,
-      refresh,
+      searchQueryChange,
       handleAddLabel,
       showOrHideContent,
       changeQueryTime,

@@ -5,12 +5,12 @@
         <CommonTimeRange @changeQueryTime="changeQueryTime" />
       </a-form-item>
       <a-form-item label="限制条数">
-        <a-input @pressEnter="searchLog" size="small" v-model:value="queryForm.limit" placeholder="默认1000条" />
+        <a-input @pressEnter="searchQueryChange" size="small" v-model:value="queryForm.limit" placeholder="默认1000条" />
       </a-form-item>
     </a-form>
     <a-form :model="queryForm">
       <a-form-item label="LogQL">
-        <a-textarea @pressEnter="searchLog" v-model:value="queryForm.searchContent" placeholder="input LogQL, Enter" :rows="4" />
+        <a-textarea @pressEnter="searchQueryChange" v-model:value="queryForm.searchContent" placeholder="input LogQL, Enter" :rows="4" />
       </a-form-item>
     </a-form>
 
@@ -65,10 +65,15 @@ export default {
         console.error(e)
       }
     }
+    const searchQueryChange = () => {
+      queryForm.lastPageStartTime = undefined
+      queryForm.nextPageStartTime = undefined
+      searchLog()
+    }
     const changeQueryTime = (obj: any) => {
       queryForm.startTime = obj?.startTime
       queryForm.endTime = obj?.endTime
-      searchLog()
+      searchQueryChange()
     }
     const lastPageLog = (lastTime: string) => {
       queryForm.lastPageStartTime = lastTime
@@ -88,6 +93,7 @@ export default {
       queryForm,
       scrollTableRef,
       searchLog,
+      searchQueryChange,
       changeQueryTime,
       lastPageLog,
       nextPageLog,
