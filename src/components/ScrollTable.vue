@@ -169,11 +169,9 @@ export default {
       pageInfo.nextPageStartTime = value.nextPageStartTime
     }
     const lastPageClick = () => {
-      console.log('shang yiye')
       emit('lastPageLog', pageInfo.lastPageStartTime)
     }
     const nextPAgeClick = () => {
-      console.log('xia yi ye')
       emit('nextPageLog', pageInfo.nextPageStartTime)
     }
 
