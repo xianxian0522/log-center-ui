@@ -52,7 +52,7 @@
     </a-form>
 
     <a-spin :spinning="spinning" >
-      <ScrollTable :data-source="logList" :is-show-context="true">
+      <ScrollTable :data-source="logList" :is-show-context="true" ref="scrollTableRef" @lastPageLog="lastPageLog" @nextPageLog="nextPageLog">
         <template v-slot:default="{ logContext }">
           <div class="more-message-div">
             <div v-if="logContext.isShow">
@@ -92,7 +92,7 @@ import logCenterRepository from "@/api/logCenterRepository";
 import { onMounted, reactive, UnwrapRef, toRefs, ref, watch, nextTick } from "vue";
 import valueRepositories from "@/composable/ValueRepositories";
 import { Empty, message } from "ant-design-vue";
-import { LabelValue, LogCenterList } from "@/utils/response";
+import { LabelValue, LogCenterList, QueryForm } from "@/utils/response";
 import ModalFormEdit from "@/components/ModalFormEdit.vue";
 import { flattenLogResult, timeValue } from "@/composable/commonRepositories";
 import LogContext from "@/components/LogContext.vue";
@@ -122,11 +122,13 @@ export default {
       biz: undefined,
       app: undefined,
     })
-    const queryForm = reactive({
+    const queryForm: UnwrapRef<QueryForm> = reactive({
       searchContent: undefined,
       limit: undefined,
-      startTime: null,
-      endTime: null,
+      startTime: undefined,
+      endTime: undefined,
+      lastPageStartTime: undefined,
+      nextPageStartTime: undefined,
     })
     const labelValue = ref<{[key: string]: string[]}>()
     const columns = [
@@ -140,6 +142,7 @@ export default {
     const showContent = ref(false)
     const contextParams = ref()
     const contextQuery = ref()
+    const scrollTableRef = ref()
 
     const addLabel = () => {
       modalVisible.value = true
@@ -167,6 +170,7 @@ export default {
         showContent.value = !!queryForm.searchContent
         spinning.value = false
         logList.value = flattenLogResult(data.lokiRes.data.result)
+        scrollTableRef.value?.changePageInfo(data)
       } catch (e) {
         spinning.value = false
         console.error(e)
@@ -208,6 +212,16 @@ export default {
       queryForm.endTime = obj?.endTime
       queryValues()
     }
+    const lastPageLog = (lastTime: string) => {
+      queryForm.lastPageStartTime = lastTime
+      queryForm.nextPageStartTime = undefined
+      refresh()
+    }
+    const nextPageLog = (nextTime: string) => {
+      queryForm.nextPageStartTime = nextTime
+      queryForm.lastPageStartTime = undefined
+      refresh()
+    }
 
     return {
       queryForm,
@@ -220,12 +234,15 @@ export default {
       showContent,
       contextParams,
       contextQuery,
+      scrollTableRef,
       simpleImage: Empty.PRESENTED_IMAGE_SIMPLE,
       addLabel,
       refresh,
       handleAddLabel,
       showOrHideContent,
       changeQueryTime,
+      lastPageLog,
+      nextPageLog,
     }
   }
 };

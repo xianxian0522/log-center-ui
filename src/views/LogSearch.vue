@@ -14,11 +14,9 @@
       </a-form-item>
     </a-form>
 
-    <a-spin :spinning="spinning" style="height: inherit">
-<!--      <CommonTable :columns="columns" :data-source="logList" ></CommonTable>-->
-      <ScrollTable :data-source="logList" />
+    <a-spin :spinning="spinning" >
+      <ScrollTable ref="scrollTableRef" :data-source="logList" @lastPageLog="lastPageLog" @nextPageLog="nextPageLog" />
     </a-spin>
-<!--    加上一页 下一页的button-->
   </div>
 </template>
 
@@ -26,24 +24,15 @@
 import { reactive, ref, UnwrapRef } from "vue";
 import logCenterRepository from "@/api/logCenterRepository";
 import { flattenLogResult, timeValue } from "@/composable/commonRepositories";
-import { LogCenterList } from "@/utils/response";
-import CommonTable from "@/components/CommonTable.vue";
+import { LogCenterList, QueryForm } from "@/utils/response";
 import moment, { Moment } from "moment";
 import CommonTimeRange from "@/components/CommonTimeRange.vue";
 import ScrollTable from "@/components/ScrollTable.vue";
-
-export interface QueryForm {
-  searchContent?: string,
-  limit?: string,
-  startTime?: Moment,
-  endTime?: Moment,
-}
 
 export default {
   name: "LogSearch",
   components: {
     CommonTimeRange,
-    // CommonTable,
     ScrollTable,
   },
   setup() {
@@ -52,6 +41,8 @@ export default {
       limit: undefined,
       startTime: undefined,
       endTime: undefined,
+      lastPageStartTime: undefined,
+      nextPageStartTime: undefined,
     })
     const columns = [
       { dataIndex: 'time', key: 'time', title: '时间', fixed: 'left', width: 200},
@@ -59,16 +50,7 @@ export default {
     ]
     const logList = ref<LogCenterList[]>([])
     const spinning = ref(false)
-
-    // for (let index = 0; index < 500; index++) {
-    //   logList.value.push({
-    //     index: index,
-    //     time: moment() + '',
-    //     message: 'message' + index,
-    //     oldTime: moment().valueOf() + index + '',
-    //     isShow: true,
-    //   })
-    // }
+    const scrollTableRef = ref()
 
     const searchLog = async () => {
       try {
@@ -76,6 +58,7 @@ export default {
         const query = timeValue(queryForm)
         const data = await logCenterRepository.searchLog(query)
         logList.value = flattenLogResult(data.lokiRes.data.result)
+        scrollTableRef.value?.changePageInfo(data)
         spinning.value = false
       } catch (e) {
         spinning.value = false
@@ -87,14 +70,27 @@ export default {
       queryForm.endTime = obj?.endTime
       searchLog()
     }
+    const lastPageLog = (lastTime: string) => {
+      queryForm.lastPageStartTime = lastTime
+      queryForm.nextPageStartTime = undefined
+      searchLog()
+    }
+    const nextPageLog = (nextTime: string) => {
+      queryForm.nextPageStartTime = nextTime
+      queryForm.lastPageStartTime = undefined
+      searchLog()
+    }
 
     return {
       columns,
       logList,
       spinning,
       queryForm,
+      scrollTableRef,
       searchLog,
       changeQueryTime,
+      lastPageLog,
+      nextPageLog,
     }
   }
 };

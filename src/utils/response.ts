@@ -1,3 +1,5 @@
+import { Moment } from "moment";
+
 export interface LoginResponse {
   url?: string;
   token?: string;
@@ -9,6 +11,14 @@ export interface BarItem {
   name: string;
   route?: string;
   children?: BarItem[];
+}
+export interface QueryForm {
+  searchContent?: string,
+  limit?: string,
+  startTime?: Moment,
+  endTime?: Moment,
+  lastPageStartTime?: string,
+  nextPageStartTime?: string,
 }
 export interface ValueResponse {
   data: string[];

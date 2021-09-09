@@ -31,12 +31,16 @@
         </div>
       </div>
     </div>
+    <div class="page-btns">
+      <a-button type="primary" :disabled="isTop" @click="lastPageClick">上一页</a-button>
+      <a-button type="primary" :disabled="isBottom" @click="nextPAgeClick">下一页</a-button>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { computed, onMounted, onUpdated, reactive, ref, toRefs, watch } from "vue";
-import { LogCenterList } from "@/utils/response";
+import { LogCenterList, LogSearchResponse } from "@/utils/response";
 import { Empty } from "ant-design-vue";
 
 interface ItemPosition {
@@ -60,9 +64,16 @@ export default {
     },
     isShowContext: Boolean,
   },
-  setup(props: any) {
+  emits: ['nextPageLog', 'lastPageLog'],
+  setup(props: any, {emit}: any) {
     const tableBodyRef = ref()
     const logListData = ref<LogCenterList[]>(props.dataSource)
+    const pageInfo = reactive({
+      isBottom: true,
+      isTop: true,
+      lastPageStartTime: '',
+      nextPageStartTime: '',
+    })
     const tableState = reactive({
       start: 0,
       end: 10,
@@ -78,7 +89,10 @@ export default {
       return Math.ceil(tableState.screenHeight / props.itemSize)
     })
     const visibleData = computed(() => {
-      return logListData.value.slice(tableState.start, Math.min(tableState.end, logListData.value.length))
+      const start = tableState.start > 2 ? tableState.start - 2 : tableState.start
+      const min = Math.min(tableState.end, logListData.value.length)
+      const end = min < logListData.value.length - 2 ? min - 2 : min
+      return logListData.value.slice(start, end)
     })
     const getTransForm = computed(() => {
       return `translateY(${tableState.startOffset}px)`
@@ -147,6 +161,22 @@ export default {
     const changeScreenHeight = () => {
       tableState.screenHeight = logListData.value.length === 0 ? 382 : props.screenAllHeight
     }
+
+    const changePageInfo = (value: LogSearchResponse) => {
+      pageInfo.isBottom = value.isBottom
+      pageInfo.isTop = value.isTop
+      pageInfo.lastPageStartTime = value.lastPageStartTime
+      pageInfo.nextPageStartTime = value.nextPageStartTime
+    }
+    const lastPageClick = () => {
+      console.log('shang yiye')
+      emit('lastPageLog', pageInfo.lastPageStartTime)
+    }
+    const nextPAgeClick = () => {
+      console.log('xia yi ye')
+      emit('nextPageLog', pageInfo.nextPageStartTime)
+    }
+
     onMounted(() => {
       tableState.end = tableState.start + visibleCount.value
       changeScreenHeight()
@@ -170,7 +200,11 @@ export default {
       logListData,
       getTransForm,
       ...toRefs(tableState),
+      ...toRefs(pageInfo),
       scrollEvent,
+      changePageInfo,
+      lastPageClick,
+      nextPAgeClick,
     }
   }
 };
@@ -186,7 +220,7 @@ export default {
   scrollbar-width: none;
 }
 .scroll::-webkit-scrollbar {
-  //width: 0;
+  width: 0;
 }
 .scroll-table {
   width: 100%;
@@ -226,5 +260,14 @@ export default {
 }
 .scroll-tbody tr:hover {
   background: #e6f7ff;
+}
+
+.page-btns {
+  text-align: right;
+  margin-top: 20px;
+
+  button {
+    margin-left: 20px;
+  }
 }
 </style>
