@@ -7,14 +7,14 @@
       <table class="scroll-table" v-if="!isShowContext" aria-describedby="head">
         <thead class="scroll-thead" >
         <tr>
-          <th>时间</th>
-          <th>信息</th>
+          <th id="time">时间</th>
+          <th id="message">信息</th>
         </tr>
         </thead>
       </table>
       <div class="scroll" @scroll="scrollEvent" :style="{height: screenHeight + 'px'}">
         <div >
-          <table class="scroll-table scroll-table-border" aria-describedby="message">
+          <table class="scroll-table scroll-table-border" aria-describedby="message" aria-hidden="true">
             <tbody ref="tableBodyRef" class="scroll-tbody" :style="{transform: getTransForm}">
             <!--        <tr v-for="data in visibleData" :key="JSON.stringify(data)" :style="{height: itemSize + 'px'}">-->
             <tr v-for="(data) in visibleData" :key="JSON.stringify(data)" :id="data.index" >
