@@ -56,7 +56,7 @@ export default {
     dataSource: Array,
     itemSize: {
       type: Number,
-      default: 50,
+      default: 40,
     },
     screenAllHeight: {
       type: Number,

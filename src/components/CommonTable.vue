@@ -27,7 +27,7 @@
 <script lang="ts">
 import moment from "moment";
 import { TableState } from "ant-design-vue/es/table/interface";
-import { reactive, computed, onMounted, toRefs } from "vue";
+import { reactive } from "vue";
 
 export default {
   name: "CommonTable",
@@ -40,7 +40,7 @@ export default {
       default: 'auto'
     },
   },
-  setup(props:any) {
+  setup() {
     const pagination = reactive({
       showSizeChanger: true,
       current: 1,
