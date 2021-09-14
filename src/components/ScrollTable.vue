@@ -4,7 +4,7 @@
       <a-empty :description="'暂无数据'" :image="simpleImage" />
     </div>
     <div v-else>
-      <table class="scroll-table" v-if="!isShowContext">
+      <table class="scroll-table" v-if="!isShowContext" aria-describedby="head">
         <thead class="scroll-thead" >
         <tr>
           <th>时间</th>
@@ -14,7 +14,7 @@
       </table>
       <div class="scroll" @scroll="scrollEvent" :style="{height: screenHeight + 'px'}">
         <div >
-          <table class="scroll-table scroll-table-border" >
+          <table class="scroll-table scroll-table-border" aria-describedby="message">
             <tbody ref="tableBodyRef" class="scroll-tbody" :style="{transform: getTransForm}">
             <!--        <tr v-for="data in visibleData" :key="JSON.stringify(data)" :style="{height: itemSize + 'px'}">-->
             <tr v-for="(data) in visibleData" :key="JSON.stringify(data)" :id="data.index" >
