@@ -58,7 +58,7 @@
             <div v-if="logContext.isShow">
               <LogContext :contextQuery="contextQuery" :contextParams="contextParams"/>
             </div>
-            <span>{{ logContext.message }}</span>
+            <span v-html="logContext.message"></span>
             <a-button class="hide-content" type="link" @click="showOrHideContent(logContext)" v-if="showContent">{{ logContext.isShow ? 'hide' : 'show' }} content</a-button>
           </div>
         </template>
@@ -150,11 +150,19 @@ export default {
         showContent.value = !!queryForm.searchContent
         spinning.value = false
         logList.value = flattenLogResult(data.lokiRes.data.result)
+        if (queryForm.searchContent) {
+          messageReplace()
+        }
         scrollTableRef.value?.changePageInfo(data)
       } catch (e) {
         spinning.value = false
         console.error(e)
       }
+    }
+    const messageReplace = () => {
+      logList.value.forEach((item: LogCenterList) => {
+        item.message = item.message.replace(new RegExp(queryForm.searchContent!, 'g'), `<span style="color: #ecbb13;font-weight: bold;">${queryForm.searchContent}</span>` )
+      })
     }
     const searchQueryChange = () => {
       queryForm.lastPageStartTime = undefined
@@ -243,17 +251,6 @@ export default {
 .log-form, .log-add-label {
   margin-bottom: 20px;
 }
-//.log-table ::v-deep .ant-table-thead > tr > th, .log-table ::v-deep .ant-table-tbody > tr > td {
-//  white-space: pre-wrap;
-//  word-break: break-all;
-//}
-//.log-table ::v-deep .ant-table-scroll {
-//  overflow: inherit;
-//}
-//.log-table {
-//  font-family: "Roboto Mono", monospace;
-//  font-size: 12px;
-//}
 .hide-content {
   visibility: hidden;
 }
