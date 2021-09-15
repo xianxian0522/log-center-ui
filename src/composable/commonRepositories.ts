@@ -16,5 +16,5 @@ export function timeValue(queryForm: any) {
 export function flattenLogResult(data: LogResultResponse[]) {
   const result = data.map((re: LogResultResponse) => re.values)
   const resultFlatten = _.flatten(result)
-  return resultFlatten.map(r => ({ time: moment(parseInt(r?.[0], 10) / 1000000).format('YYYY-MM-DD HH:mm:ss'),message: r?.[1], oldTime: r?.[0], isShow: false}))
+  return resultFlatten.map((r, index: number) => ({ index: index, time: moment(parseInt(r?.[0], 10) / 1000000).format('YYYY-MM-DD HH:mm:ss'),message: r?.[1], oldTime: r?.[0], isShow: false}))
 }

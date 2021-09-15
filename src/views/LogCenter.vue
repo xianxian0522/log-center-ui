@@ -24,7 +24,7 @@
         <a-button @click="addLabel">添加</a-button>
       </a-form-item>
       <a-form-item>
-        <a-button @click="refresh">搜索</a-button>
+        <a-button @click="searchQueryChange">搜索</a-button>
       </a-form-item>
     </a-form>
     <div class="log-title-label">添加的标签</div>
@@ -44,30 +44,25 @@
         <CommonTimeRange @changeQueryTime="changeQueryTime" />
       </a-form-item>
       <a-form-item label="搜索">
-        <a-input size="small" v-model:value="queryForm.searchContent" placeholder="搜索内容" />
+        <a-input size="small" @pressEnter="searchQueryChange" v-model:value="queryForm.searchContent" placeholder="搜索内容" />
       </a-form-item>
       <a-form-item label="限制条数">
-        <a-input size="small" v-model:value="queryForm.limit" placeholder="默认500条" />
+        <a-input size="small" @pressEnter="searchQueryChange" v-model:value="queryForm.limit" placeholder="默认1000条" />
       </a-form-item>
     </a-form>
 
-    <a-spin :spinning="spinning">
-      <a-table class="log-table" :show-header="false" :columns="columns"
-               :pagination="false"
-               :data-source="logList" :rowKey="record => record.oldTime + record.message">
-        <template #name="{ text }">
-          <a>{{ text }}</a>
-        </template>
-        <template #message="{ record }">
+    <a-spin :spinning="spinning" >
+      <ScrollTable :data-source="logList" :is-show-context="true" ref="scrollTableRef" @lastPageLog="lastPageLog" @nextPageLog="nextPageLog">
+        <template v-slot:default="{ logContext }">
           <div class="more-message-div">
-            <div v-if="record.isShow">
+            <div v-if="logContext.isShow">
               <LogContext :contextQuery="contextQuery" :contextParams="contextParams"/>
             </div>
-            <span>{{ record.message }}</span>
-            <a-button class="hide-content" type="link" @click="showOrHideContent(record)" v-if="showContent">{{ record.isShow ? 'hide' : 'show' }} content</a-button>
+            <span v-html="logContext.message"></span>
+            <a-button class="hide-content" type="link" @click="showOrHideContent(logContext)" v-if="showContent">{{ logContext.isShow ? 'hide' : 'show' }} content</a-button>
           </div>
         </template>
-      </a-table>
+      </ScrollTable>
     </a-spin>
 
     <a-modal v-model:visible="modalVisible" title="添加标签" width="750px" :footer="null">
@@ -78,14 +73,15 @@
 
 <script lang="ts">
 import logCenterRepository from "@/api/logCenterRepository";
-import { onMounted, reactive, UnwrapRef, toRefs, ref, watch } from "vue";
+import { reactive, UnwrapRef, toRefs, ref, } from "vue";
 import valueRepositories from "@/composable/ValueRepositories";
 import { Empty, message } from "ant-design-vue";
-import { LabelValue, LogCenterList } from "@/utils/response";
+import { LabelValue, LogCenterList, QueryForm } from "@/utils/response";
 import ModalFormEdit from "@/components/ModalFormEdit.vue";
 import { flattenLogResult, timeValue } from "@/composable/commonRepositories";
 import LogContext from "@/components/LogContext.vue";
 import CommonTimeRange from "@/components/CommonTimeRange.vue";
+import ScrollTable from "@/components/ScrollTable.vue";
 
 export interface LabelState {
   bizLabels: string[];
@@ -95,7 +91,10 @@ export interface LabelState {
 
 export default {
   name: "LogCenter",
-  components: { ModalFormEdit, LogContext, CommonTimeRange },
+  components: {
+    ModalFormEdit, CommonTimeRange,
+    LogContext, ScrollTable
+  },
   setup() {
     const { getValues } = valueRepositories()
     const labelState: UnwrapRef<LabelState> = reactive({
@@ -107,24 +106,23 @@ export default {
       biz: undefined,
       app: undefined,
     })
-    const queryForm = reactive({
+    const queryForm: UnwrapRef<QueryForm> = reactive({
       searchContent: undefined,
       limit: undefined,
-      startTime: null,
-      endTime: null,
+      startTime: undefined,
+      endTime: undefined,
+      lastPageStartTime: undefined,
+      nextPageStartTime: undefined,
     })
     const labelValue = ref<{[key: string]: string[]}>()
-    const columns = [
-      { dataIndex: 'time', key: 'time', title: '时间', fixed: 'left', width: 200},
-      { dataIndex: 'message', key: 'message', title: '信息', slots: { customRender: 'message', }},
-      // { title: '操作', key: 'action', fixed: 'right', slots: { customRender: 'action', }, align: 'center', width: 120},
-    ]
+
     const spinning = ref(false)
     const logList = ref<LogCenterList[]>([])
     const modalVisible = ref(false)
     const showContent = ref(false)
     const contextParams = ref()
     const contextQuery = ref()
+    const scrollTableRef = ref()
 
     const addLabel = () => {
       modalVisible.value = true
@@ -152,13 +150,24 @@ export default {
         showContent.value = !!queryForm.searchContent
         spinning.value = false
         logList.value = flattenLogResult(data.lokiRes.data.result)
-        // const result = data.lokiRes.data.result.map((re: LogResultResponse) => re.values)
-        // const resultFlatten = _.flatten(result)
-        // logList.value = resultFlatten.map(r => ({ time: moment(parseInt(r?.[0], 10) / 1000000).format('YYYY-MM-DD HH:mm:ss'),message: r?.[1], oldTime: r?.[0], isShow: false}))
+        if (queryForm.searchContent) {
+          messageReplace()
+        }
+        scrollTableRef.value?.changePageInfo(data)
       } catch (e) {
         spinning.value = false
         console.error(e)
       }
+    }
+    const messageReplace = () => {
+      logList.value.forEach((item: LogCenterList) => {
+        item.message = item.message.replace(new RegExp(queryForm.searchContent!, 'g'), `<span style="color: #ecbb13;font-weight: bold;">${queryForm.searchContent}</span>` )
+      })
+    }
+    const searchQueryChange = () => {
+      queryForm.lastPageStartTime = undefined
+      queryForm.nextPageStartTime = undefined
+      refresh()
     }
     const showOrHideContent = (log: LogCenterList) => {
       log.isShow = !log.isShow
@@ -195,6 +204,19 @@ export default {
       queryForm.startTime = obj?.startTime
       queryForm.endTime = obj?.endTime
       queryValues()
+      if (searchForm.biz && searchForm.app) {
+        searchQueryChange()
+      }
+    }
+    const lastPageLog = (lastTime: string) => {
+      queryForm.lastPageStartTime = lastTime
+      queryForm.nextPageStartTime = undefined
+      refresh()
+    }
+    const nextPageLog = (nextTime: string) => {
+      queryForm.nextPageStartTime = nextTime
+      queryForm.lastPageStartTime = undefined
+      refresh()
     }
 
     return {
@@ -202,18 +224,20 @@ export default {
       searchForm,
       logList,
       spinning,
-      columns,
       ...toRefs(labelState),
       modalVisible,
       showContent,
       contextParams,
       contextQuery,
+      scrollTableRef,
       simpleImage: Empty.PRESENTED_IMAGE_SIMPLE,
       addLabel,
-      refresh,
+      searchQueryChange,
       handleAddLabel,
       showOrHideContent,
       changeQueryTime,
+      lastPageLog,
+      nextPageLog,
     }
   }
 };
@@ -227,24 +251,13 @@ export default {
 .log-form, .log-add-label {
   margin-bottom: 20px;
 }
-.log-table ::v-deep .ant-table-thead > tr > th, .log-table ::v-deep .ant-table-tbody > tr > td {
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-.log-table ::v-deep .ant-table-scroll {
-  overflow: inherit;
-}
-.log-table {
-  font-family: "Roboto Mono", monospace;
-  font-size: 12px;
-}
 .hide-content {
   visibility: hidden;
 }
-.ant-table-tbody > tr {
+.scroll-tbody > tr {
   cursor: pointer;
 }
-.ant-table-tbody > tr:hover .hide-content {
+.scroll-tbody > tr:hover .hide-content {
   visibility: visible;
 }
 .more-message-div {

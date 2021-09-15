@@ -28,6 +28,7 @@
         </div>
       </a-spin>
     </div>
+    <div style="clear: both"></div>
   </div>
 </template>
 
@@ -83,7 +84,7 @@ export default {
   position: absolute;
   width: calc(100% + 20px);
   left: -13px;
-  z-index: 10;
+  z-index: 12;
   overflow: hidden;
   background: #fff;
   box-shadow: rgb(255 255 255) 0 0 10px;

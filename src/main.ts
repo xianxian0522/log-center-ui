@@ -17,7 +17,6 @@ import HeaderComponent from 'menu-header-component/dist/menu-header-component.um
 import 'menu-header-component/dist/menu-header-component.css'
 
 const app = createApp(App)
-
 app.use(router)
 
 app.use(Button)

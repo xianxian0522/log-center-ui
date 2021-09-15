@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div >
     <a-table class="common-table" :columns="columns" :data-source="dataSource" :rowKey="record => record.id + JSON.stringify(record)"
              @change="paginationChange"
              :scroll="{x: scrollX}"
@@ -46,6 +46,7 @@ export default {
       current: 1,
       pageSize: 10,
     })
+
     const paginationChange = (page: TableState['pagination']) => {
       const pageNumber = page?.current as number
       const pageSize = page?.pageSize as number
